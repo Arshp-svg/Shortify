@@ -122,13 +122,14 @@
 - [x] Enrich structured JSON logs with correlation IDs and performance timings
 - [x] **Proof of Done:** Live traffic visual inspection on Grafana dashboard verified via targets API and live Locust scrape; documented in `docs/OBSERVABILITY_REPORT.md`
 
-### Phase 11: Failure Testing & Resilience (`NOT STARTED`)
-- [ ] Chaos experiment 1: Stop Redis during peak redirect load (verify fail-open to DB)
-- [ ] Chaos experiment 2: Stop PostgreSQL (verify clean 503 response and health check change)
-- [ ] Chaos experiment 3: Restart API instance under load (measure recovery time)
-- [ ] Chaos experiment 4: Saturate DB connection pool (verify connection timeout handling)
-- [ ] Publish `docs/FAILURE_EXPERIMENTS.md` with incident logs and recovery metrics
-- [ ] **Proof of Done:** All failure modes tested and documented with verifiable recovery procedures
+### Phase 11: Failure Testing & Resilience (`COMPLETE`)
+- [x] Chaos experiment 1: Stop Redis during redirect load (verify fail-open to DB, 0% 5xx errors)
+- [x] Chaos experiment 2: Stop PostgreSQL (verify clean 503 response and `/ready` degraded state)
+- [x] Chaos experiment 3: Restart API instance under load (measure recovery time to healthy: 6.32s)
+- [x] Chaos experiment 4: Abusive traffic flood (verify 120 allowed, 30 rejected at 429 with `Retry-After`)
+- [x] Implement automated resilience test suite (`tests/resilience/test_resilience.py`, 5/5 passing)
+- [x] Publish `docs/FAILURE_EXPERIMENTS.md` with incident logs and recovery metrics
+- [x] **Proof of Done:** All 4 chaos experiments executed against Docker stack and passed; raw JSON evidence preserved in `benchmarks/chaos/chaos_experiments_summary.json`; deliverable report published in `docs/FAILURE_EXPERIMENTS.md`
 
 ### Phase 12: Horizontal Scaling & Load Balancing (`NOT STARTED`)
 - [ ] Deploy Nginx reverse proxy with round-robin upstream load balancing

@@ -1,6 +1,7 @@
 """Redis cache-aside service with fail-open resilience and TTL management."""
 
 import logging
+import time
 from typing import Any
 
 import redis.asyncio as aioredis
@@ -28,11 +29,15 @@ class CacheService:
         self._local_hits: int = 0
         self._local_misses: int = 0
         self._local_errors: int = 0
+        self._circuit_open_until: float = 0.0
+        self._circuit_break_duration: float = 3.0
 
     @property
     def is_available(self) -> bool:
-        """Indicate whether caching is enabled and client configured."""
-        return self.enabled and self.redis is not None
+        """Indicate whether caching is enabled, client configured, and circuit is not open."""
+        if not self.enabled or self.redis is None:
+            return False
+        return time.perf_counter() >= self._circuit_open_until
 
     def _url_key(self, short_code: str) -> str:
         """Format consistent namespaced cache key."""
@@ -60,6 +65,7 @@ class CacheService:
             record_cache_operation("get", "miss")
             return None
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
+            self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             record_cache_operation("get", "error")
             logger.warning("Redis cache read failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
@@ -85,6 +91,7 @@ class CacheService:
             record_cache_operation("set", "ok")
             return True
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
+            self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             record_cache_operation("set", "error")
             logger.warning("Redis cache write failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
@@ -103,6 +110,7 @@ class CacheService:
             record_cache_operation("delete", "ok")
             return bool(deleted_count > 0)
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
+            self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             record_cache_operation("delete", "error")
             logger.warning("Redis cache invalidation failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
@@ -120,6 +128,7 @@ class CacheService:
             count = await self.redis.incr(key)
             return int(count)
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
+            self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             logger.warning("Redis click count increment failed for '%s': %s", short_code, exc)
             return None

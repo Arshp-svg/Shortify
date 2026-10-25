@@ -87,6 +87,8 @@ class RateLimiter:
 
     def __init__(self, redis_client: Redis | None = None) -> None:
         self._redis = redis_client
+        self._circuit_open_until: float = 0.0
+        self._circuit_break_duration: float = 3.0
 
     @property
     def redis(self) -> Redis:
@@ -103,6 +105,15 @@ class RateLimiter:
         window: int = 60,
     ) -> RateLimitResult:
         """Atomically evaluate if client_ip has exceeded limit within the sliding window."""
+        if time.time() < self._circuit_open_until:
+            return RateLimitResult(
+                allowed=True,
+                limit=limit,
+                remaining=limit,
+                retry_after=0,
+                fail_open=True,
+            )
+
         key = f"ratelimit:{client_ip}:{bucket}"
         now = time.time()
         member = f"{now}:{uuid.uuid4().hex[:8]}"
@@ -131,6 +142,7 @@ class RateLimiter:
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
             settings = get_settings()
             if settings.rate_limit_fail_open:
+                self._circuit_open_until = time.time() + self._circuit_break_duration
                 logger.warning(
                     "Redis rate limit check failed (%s); failing open for IP %s",
                     exc,
@@ -148,6 +160,7 @@ class RateLimiter:
 
     async def reset(self, client_ip: str, bucket: str = "default") -> None:
         """Clear rate limit counter for a client (useful in test teardown)."""
+        self._circuit_open_until = 0.0
         key = f"ratelimit:{client_ip}:{bucket}"
         try:
             await self.redis.delete(key)

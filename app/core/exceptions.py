@@ -1,11 +1,13 @@
 """Centralized exception classes and global error handlers."""
 
 import logging
+import socket
 from typing import Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logging import request_id_ctx
@@ -146,8 +148,43 @@ def register_exception_handlers(app: FastAPI) -> None:
             code = "METHOD_NOT_ALLOWED"
         return _build_error_response(exc.status_code, code, str(exc.detail))
 
+    @app.exception_handler(SQLAlchemyError)
+    async def sqlalchemy_exception_handler(_: Request, exc: SQLAlchemyError) -> JSONResponse:
+        logger.error("Database unavailable exception: %s", exc)
+        return _build_error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "DATABASE_UNAVAILABLE",
+            "Database service is temporarily unavailable. Please retry shortly.",
+        )
+
+    @app.exception_handler(socket.gaierror)
+    async def gaierror_exception_handler(_: Request, exc: socket.gaierror) -> JSONResponse:
+        logger.error("Database host resolution / network exception: %s", exc)
+        return _build_error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "DATABASE_UNAVAILABLE",
+            "Database service is temporarily unavailable. Please retry shortly.",
+        )
+
+    @app.exception_handler(ConnectionRefusedError)
+    async def conn_refused_exception_handler(_: Request, exc: ConnectionRefusedError) -> JSONResponse:
+        logger.error("Database connection refused: %s", exc)
+        return _build_error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "DATABASE_UNAVAILABLE",
+            "Database service is temporarily unavailable. Please retry shortly.",
+        )
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(_: Request, exc: Exception) -> JSONResponse:
+        exc_str = str(exc).lower()
+        if isinstance(exc, (OSError, socket.error)) or "name resolution" in exc_str or "cannot connect" in exc_str:
+            logger.error("Database connection failure caught in unhandled: %s", exc)
+            return _build_error_response(
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+                "DATABASE_UNAVAILABLE",
+                "Database service is temporarily unavailable. Please retry shortly.",
+            )
         logger.exception("Unhandled server exception: %s", exc)
         return _build_error_response(
             status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -1,5 +1,6 @@
 """SQLAlchemy async database engine and session management with connection pool tuning."""
 
+import contextlib
 import logging
 from collections.abc import AsyncGenerator
 
@@ -43,10 +44,12 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
             yield session
             await session.commit()
         except Exception:
-            await session.rollback()
+            with contextlib.suppress(Exception):
+                await session.rollback()
             raise
         finally:
-            await session.close()
+            with contextlib.suppress(Exception):
+                await session.close()
 
 
 async def close_db_engine() -> None:

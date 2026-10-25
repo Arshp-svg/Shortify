@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     redis_port: int = 6379
     redis_password: str | None = None
     redis_db: int = 0
-    redis_timeout_seconds: float = 2.0
+    redis_timeout_seconds: float = 0.5
     cache_enabled: bool = True
     cache_ttl_seconds: int = 3600
     cache_fail_open: bool = True

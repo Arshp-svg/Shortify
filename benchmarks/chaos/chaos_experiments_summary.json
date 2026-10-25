@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-25T13:15:07.229493+00:00",
+    "git_commit": "7771089",
+    "python_version": "3.12.10",
+    "system": "Windows-11-10.0.26300-SP0"
+  },
+  "experiments": {
+    "redis_outage": {
+      "scenario": "Redis Outage Under Redirect Load",
+      "fault_injected": "docker compose stop redis",
+      "total_requests": 15,
+      "status_distribution": {
+        "307": 15
+      },
+      "successful_307_redirects": 15,
+      "client_visible_5xx_errors": 0,
+      "error_rate_pct": 0.0,
+      "avg_latency_ms": 643.6,
+      "fail_open_header_verified": true,
+      "recovery_time_seconds": 1.41,
+      "recovered": true,
+      "pass": true
+    },
+    "postgres_outage": {
+      "scenario": "PostgreSQL Outage",
+      "fault_injected": "docker compose stop postgres",
+      "ready_probe_status_code": 503,
+      "ready_probe_payload": {
+        "status": "unready",
+        "checks": {
+          "database": "disconnected: [Errno -3] Temporary failure in name resolution",
+          "redis": "healthy"
+        }
+      },
+      "url_create_status_code": 503,
+      "url_create_error_code": "DATABASE_UNAVAILABLE",
+      "recovery_time_seconds": 1.75,
+      "recovered": true,
+      "pass": true
+    },
+    "api_restart": {
+      "scenario": "API Container Restart",
+      "fault_injected": "docker compose restart api",
+      "restart_downtime_seconds": 6.32,
+      "post_restart_requests": 40,
+      "post_restart_status_distribution": {
+        "307": 40
+      },
+      "recovered": true,
+      "pass": true
+    },
+    "abusive_flood": {
+      "scenario": "Abusive Traffic Flood",
+      "fault_injected": "150 requests in burst from single IP 198.51.100.77",
+      "total_requests": 150,
+      "allowed_307_count": 120,
+      "rejected_429_count": 30,
+      "retry_after_header_verified": true,
+      "pass": true
+    }
+  }
+}
