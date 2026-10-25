@@ -16,6 +16,7 @@ from app.core.config import get_settings
 from app.core.database import close_db_engine
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import request_id_ctx, setup_logging
+from app.core.metrics import get_metrics_response, prometheus_metrics_middleware
 from app.core.rate_limit import rate_limit_middleware
 from app.core.redis import close_redis
 
@@ -86,8 +87,9 @@ async def request_correlation_and_logging_middleware(
         request_id_ctx.reset(token)
 
 
-# Rate limiting middleware
+# Rate limiting and metrics middlewares (metrics wraps rate limiter)
 app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(prometheus_metrics_middleware)
 
 # Mount root health/readiness endpoints for orchestrators
 app.include_router(health_router)
@@ -95,8 +97,10 @@ app.include_router(health_router)
 # Mount versioned API routes
 app.include_router(api_v1_router)
 
-# Mount root redirect handler
-app.include_router(redirect_router)
+@app.get("/metrics", tags=["Observability"], include_in_schema=False)
+async def metrics() -> Response:
+    """Prometheus metrics scrape endpoint."""
+    return get_metrics_response()
 
 
 @app.get("/", tags=["Root"])
@@ -108,4 +112,9 @@ async def root() -> dict[str, str]:
         "docs": "/docs",
         "health": "/health",
         "ready": "/ready",
+        "metrics": "/metrics",
     }
+
+
+# Mount root redirect handler (MUST be mounted last to avoid capturing static root routes)
+app.include_router(redirect_router)

@@ -6,6 +6,8 @@ from typing import Any
 import redis.asyncio as aioredis
 from redis.exceptions import RedisError
 
+from app.core.metrics import record_cache_operation
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,6 +46,7 @@ class CacheService:
         """Retrieve destination URL from Redis cache with fail-open error handling."""
         if not self.is_available or self.redis is None:
             self._local_misses += 1
+            record_cache_operation("get", "bypass")
             return None
 
         key = self._url_key(short_code)
@@ -51,11 +54,14 @@ class CacheService:
             val = await self.redis.get(key)
             if val is not None:
                 self._local_hits += 1
+                record_cache_operation("get", "hit")
                 return str(val)
             self._local_misses += 1
+            record_cache_operation("get", "miss")
             return None
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
             self._local_errors += 1
+            record_cache_operation("get", "error")
             logger.warning("Redis cache read failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
             if self.fail_open:
                 return None
@@ -76,9 +82,11 @@ class CacheService:
 
         try:
             await self.redis.set(key, original_url, ex=effective_ttl)
+            record_cache_operation("set", "ok")
             return True
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
             self._local_errors += 1
+            record_cache_operation("set", "error")
             logger.warning("Redis cache write failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
             if self.fail_open:
                 return False
@@ -92,9 +100,11 @@ class CacheService:
         key = self._url_key(short_code)
         try:
             deleted_count = await self.redis.delete(key)
+            record_cache_operation("delete", "ok")
             return bool(deleted_count > 0)
         except (RedisError, ConnectionError, TimeoutError, OSError) as exc:
             self._local_errors += 1
+            record_cache_operation("delete", "error")
             logger.warning("Redis cache invalidation failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
             if self.fail_open:
                 return False

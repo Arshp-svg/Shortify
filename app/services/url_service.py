@@ -11,6 +11,7 @@ from app.core.exceptions import (
     EntityNotFoundException,
     ShortifyException,
 )
+from app.core.metrics import record_url_operation
 from app.models.url import URL
 from app.repositories.url_repository import URLRepository
 from app.schemas.url import URLCreateRequest, URLResponse, URLStatsResponse
@@ -71,6 +72,7 @@ class URLService:
                     expires_at=payload.expires_at,
                     user_id=user_id,
                 )
+                record_url_operation("create")
                 return self._to_response(url_record)
             except IntegrityError as exc:
                 raise EntityConflictException(
@@ -89,6 +91,7 @@ class URLService:
                     expires_at=payload.expires_at,
                     user_id=user_id,
                 )
+                record_url_operation("create")
                 return self._to_response(url_record)
             except IntegrityError:
                 logger.warning(
@@ -115,6 +118,7 @@ class URLService:
                 await self.cache_service.record_click(short_code)
                 if not self.buffer_clicks:
                     await self.repository.increment_click_count_by_code(short_code)
+                record_url_operation("redirect")
                 return cached_destination
 
         # 2. Database Fallback (Cache Miss or Cache Unavailable)
@@ -144,6 +148,7 @@ class URLService:
 
         # 4. Atomic Click Count Increment in Database
         await self.repository.increment_click_count(url_record.id)
+        record_url_operation("redirect")
         return url_record.original_url
 
     async def get_url(self, url_id: int) -> URLResponse:
@@ -164,6 +169,7 @@ class URLService:
                 f"URL with ID {url_id} not found.",
                 code="URL_NOT_FOUND",
             )
+        record_url_operation("stats")
         return URLStatsResponse(
             id=url_record.id,
             short_code=url_record.short_code,
@@ -193,3 +199,4 @@ class URLService:
         # Immediate Cache Invalidation
         if self.cache_service is not None:
             await self.cache_service.delete_url(url_record.short_code)
+        record_url_operation("delete")

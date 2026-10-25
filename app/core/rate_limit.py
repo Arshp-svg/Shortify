@@ -13,6 +13,7 @@ from starlette.middleware.base import RequestResponseEndpoint
 
 from app.core.config import Settings, get_settings
 from app.core.logging import request_id_ctx
+from app.core.metrics import record_rate_limit_rejection
 from app.core.redis import get_redis_client
 from app.schemas.error import ErrorDetail, ErrorResponse
 
@@ -233,6 +234,7 @@ async def rate_limit_middleware(
     )
 
     if not result.allowed:
+        record_rate_limit_rejection(bucket)
         req_id = request.headers.get("X-Request-ID") or request_id_ctx.get() or str(uuid.uuid4())
         logger.warning(
             "Rate limit exceeded for IP %s on %s %s [bucket: %s, limit: %d/%ds, retry_after: %ds]",

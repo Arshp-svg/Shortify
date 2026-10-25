@@ -20,7 +20,7 @@
 | **Phase 7** | Database performance engineering | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Experiments A, B, and C completed with raw data, EXPLAIN ANALYZE plans, and optimization report) |
 | **Phase 8** | Redis caching & cache correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Redis cache-aside, TTL/invalidation, fail-open resilience under outage, and benchmarks committed) |
 | **Phase 9** | Rate limiting & abuse controls | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Sliding-window Lua limiter, HTTP 429 Retry-After, single-IP flood test, microbenchmark, overhead comparison) |
-| **Phase 10**| Observability & dashboards | `NOT STARTED` | — | — | Pending Prometheus metrics & Grafana dashboards |
+| **Phase 10**| Observability & dashboards | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Prometheus metrics, route normalization, structured logs, provisioned Grafana dashboard verified) |
 | **Phase 11**| Failure testing & resilience | `NOT STARTED` | — | — | Pending fault injection & recovery tests |
 | **Phase 12**| Horizontal scaling & load balancing | `NOT STARTED` | — | — | Pending 1/2/4 replica scaling benchmarks |
 | **Phase 13**| Benchmark automation & regression detection | `NOT STARTED` | — | — | Pending automated benchmark CI rule |
@@ -116,11 +116,11 @@
 - [x] Benchmark endpoint latency with rate limiting enabled vs disabled
 - [x] **Proof of Done:** Quantified Redis rate-limiting latency overhead (950us p50 microbenchmark, +191ms under 50-user load, documented in `docs/RATE_LIMITING_REPORT.md`)
 
-### Phase 10: Observability & Dashboards (`NOT STARTED`)
-- [ ] Prometheus metrics middleware for requests, latencies, errors, cache hits/misses, DB queries
-- [ ] Grafana dashboard configuration for real-time visualization
-- [ ] Enrich structured JSON logs with correlation IDs and performance timings
-- [ ] **Proof of Done:** Live traffic visual inspection on Grafana dashboard
+### Phase 10: Observability & Dashboards (`COMPLETE`)
+- [x] Prometheus metrics middleware for requests, latencies, errors, cache hits/misses, DB queries
+- [x] Grafana dashboard configuration for real-time visualization (`monitoring/grafana/provisioning/dashboards/`)
+- [x] Enrich structured JSON logs with correlation IDs and performance timings
+- [x] **Proof of Done:** Live traffic visual inspection on Grafana dashboard verified via targets API and live Locust scrape; documented in `docs/OBSERVABILITY_REPORT.md`
 
 ### Phase 11: Failure Testing & Resilience (`NOT STARTED`)
 - [ ] Chaos experiment 1: Stop Redis during peak redirect load (verify fail-open to DB)
