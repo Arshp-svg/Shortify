@@ -1,0 +1,22 @@
+{
+  "timestamp_utc": "2026-10-25T11:53:03.703592+00:00",
+  "git_commit": "4773151",
+  "experiment": "Hot-Key Pareto Distribution (80/20)",
+  "concurrency": 50,
+  "metrics": {
+    "total_requests": 2325.0,
+    "failed_requests": 0.0,
+    "rps": 165.03,
+    "p50_ms": 240.0,
+    "p95_ms": 410.0,
+    "p99_ms": 550.0,
+    "avg_latency_ms": 240.7,
+    "error_rate_pct": 0.0
+  },
+  "redis_metrics": {
+    "keyspace_hits": 2052,
+    "keyspace_misses": 4106,
+    "hit_ratio_pct": 33.32,
+    "used_memory_human": "2.33M"
+  }
+}

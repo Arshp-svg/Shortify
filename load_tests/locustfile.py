@@ -109,3 +109,42 @@ class InvalidTrafficUser(FastHttpUser):
                 response.success()
             else:
                 response.failure(f"Expected 404 but got {response.status_code}")
+
+
+class HotKeyUser(FastHttpUser):
+    """Simulates Pareto / Zipfian hot-key traffic: 80% lookups hit top 10 viral keys."""
+
+    wait_time = between(0.005, 0.02)
+    max_seeded_id: ClassVar[int] = 99999
+
+    @task(8)
+    def hot_key_lookup(self) -> None:
+        # Top 10 viral short codes
+        idx = random.randint(1, 10)
+        code = f"s{idx:07d}"
+        with self.client.get(
+            f"/{code}",
+            name="/{short_code} [Hot Key]",
+            allow_redirects=False,
+            catch_response=True,
+        ) as response:
+            if response.status_code == 307:
+                response.success()
+            else:
+                response.failure(f"Expected 307 but got {response.status_code}")
+
+    @task(2)
+    def long_tail_lookup(self) -> None:
+        # Long-tail keys
+        idx = random.randint(11, self.max_seeded_id)
+        code = f"s{idx:07d}"
+        with self.client.get(
+            f"/{code}",
+            name="/{short_code} [Long Tail]",
+            allow_redirects=False,
+            catch_response=True,
+        ) as response:
+            if response.status_code == 307:
+                response.success()
+            else:
+                response.failure(f"Expected 307 but got {response.status_code}")

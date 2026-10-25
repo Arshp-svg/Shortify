@@ -16,6 +16,7 @@ from app.core.config import get_settings
 from app.core.database import close_db_engine
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import request_id_ctx, setup_logging
+from app.core.redis import close_redis
 
 logger = logging.getLogger("shortify.access")
 
@@ -29,6 +30,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     yield
     logger.info("Shutting down Shortify application...")
     await close_db_engine()
+    await close_redis()
 
 
 settings = get_settings()

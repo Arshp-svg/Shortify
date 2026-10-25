@@ -65,6 +65,18 @@ class URLRepository(BaseRepository[URL]):
         updated_count = result.scalar_one_or_none()
         return updated_count if updated_count is not None else 0
 
+    async def increment_click_count_by_code(self, short_code: str) -> int:
+        """Atomic in-database increment of click_count by short code."""
+        stmt = (
+            update(URL)
+            .where(URL.short_code == short_code)
+            .values(click_count=URL.click_count + 1)
+            .returning(URL.click_count)
+        )
+        result = await self.session.execute(stmt)
+        updated_count = result.scalar_one_or_none()
+        return updated_count if updated_count is not None else 0
+
     async def soft_delete(self, url_id: int) -> bool:
         """Soft-deactivate a URL record by setting active = False."""
         stmt = (

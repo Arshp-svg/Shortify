@@ -18,7 +18,7 @@
 | **Phase 5** | Testing strategy & quality gates | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (38 automated unit & integration tests, Postman contract collection, Ruff/mypy/Bandit quality gates) |
 | **Phase 6** | Baseline deployment & benchmarking | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Reproducible baseline benchmarks executed across all 4 workloads, 0.0% errors, report committed) |
 | **Phase 7** | Database performance engineering | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Experiments A, B, and C completed with raw data, EXPLAIN ANALYZE plans, and optimization report) |
-| **Phase 8** | Redis caching & cache correctness | `NOT STARTED` | — | — | Pending cache hit ratio & fail-open proof |
+| **Phase 8** | Redis caching & cache correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Redis cache-aside, TTL/invalidation, fail-open resilience under outage, and benchmarks committed) |
 | **Phase 9** | Rate limiting & abuse controls | `NOT STARTED` | — | — | Pending rate limiter & overhead measure |
 | **Phase 10**| Observability & dashboards | `NOT STARTED` | — | — | Pending Prometheus metrics & Grafana dashboards |
 | **Phase 11**| Failure testing & resilience | `NOT STARTED` | — | — | Pending fault injection & recovery tests |

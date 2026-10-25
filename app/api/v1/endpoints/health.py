@@ -38,6 +38,12 @@ async def ready(
         checks["database"] = f"disconnected: {e!s}"
         is_ready = False
 
+    # 2. Check Redis connectivity (non-blocking / informational for fail-open)
+    from app.core.redis import check_redis_health
+
+    redis_health = await check_redis_health()
+    checks["redis"] = str(redis_health.get("status", "unknown"))
+
     status_code = status.HTTP_200_OK if is_ready else status.HTTP_503_SERVICE_UNAVAILABLE
     response_payload = ReadyResponse(
         status="ready" if is_ready else "unready",

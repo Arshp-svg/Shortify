@@ -1,6 +1,7 @@
 """Pytest fixtures and configuration for real PostgreSQL integration tests."""
 
 from collections.abc import AsyncGenerator
+from typing import Any
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
@@ -62,13 +63,43 @@ async def clean_urls_table(db_session: AsyncSession) -> AsyncGenerator[None, Non
 
 
 @pytest_asyncio.fixture(scope="function")
-async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-    """Provide an AsyncClient wired with real database session dependency override."""
+async def test_redis_client() -> AsyncGenerator[object, None]:
+    """Provide a real async Redis client for integration testing."""
+    import redis.asyncio as aioredis
+
+    client = aioredis.Redis(
+        host=settings.redis_host,
+        port=settings.redis_port,
+        db=settings.redis_db,
+        decode_responses=True,
+    )
+    await client.flushdb()
+    yield client
+    await client.flushdb()
+    await client.close()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def async_client(
+    db_session: AsyncSession, test_redis_client: Any
+) -> AsyncGenerator[AsyncClient, None]:
+    """Provide an AsyncClient wired with real database session and Redis cache dependency overrides."""
+    from app.api.deps import get_cache_service
+    from app.services.cache_service import CacheService
 
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
+    def override_get_cache_service() -> CacheService:
+        return CacheService(
+            redis_client=test_redis_client,  # type: ignore[arg-type]
+            default_ttl=300,
+            fail_open=True,
+            enabled=True,
+        )
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_cache_service] = override_get_cache_service
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client

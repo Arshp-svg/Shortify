@@ -1,6 +1,7 @@
 """Core URL lifecycle business logic service."""
 
 import logging
+from datetime import UTC, datetime
 
 from sqlalchemy.exc import IntegrityError
 
@@ -14,6 +15,7 @@ from app.models.url import URL
 from app.repositories.url_repository import URLRepository
 from app.schemas.url import URLCreateRequest, URLResponse, URLStatsResponse
 from app.services.base62 import generate_random_code
+from app.services.cache_service import CacheService
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +23,17 @@ logger = logging.getLogger(__name__)
 class URLService:
     """Service orchestrating URL creation, resolution, validation, and analytics."""
 
-    def __init__(self, repository: URLRepository, base_url: str) -> None:
+    def __init__(
+        self,
+        repository: URLRepository,
+        base_url: str,
+        cache_service: CacheService | None = None,
+        buffer_clicks: bool = False,
+    ) -> None:
         self.repository = repository
         self.base_url = base_url.rstrip("/")
+        self.cache_service = cache_service
+        self.buffer_clicks = buffer_clicks
 
     def _to_response(self, url: URL) -> URLResponse:
         """Convert an ORM URL record to a public URLResponse schema."""
@@ -96,7 +106,18 @@ class URLService:
         )
 
     async def resolve_redirect(self, short_code: str) -> str:
-        """Resolve short code to original target URL and atomically increment access counter."""
+        """Resolve short code to target URL via Cache-Aside with fallback to PostgreSQL."""
+        # 1. Fast Cache Read Probe
+        if self.cache_service is not None:
+            cached_destination = await self.cache_service.get_url(short_code)
+            if cached_destination is not None:
+                # Cache Hit: record click and return immediately
+                await self.cache_service.record_click(short_code)
+                if not self.buffer_clicks:
+                    await self.repository.increment_click_count_by_code(short_code)
+                return cached_destination
+
+        # 2. Database Fallback (Cache Miss or Cache Unavailable)
         url_record = await self.repository.get_by_short_code(short_code)
 
         if url_record is None:
@@ -111,7 +132,17 @@ class URLService:
                 code="URL_EXPIRED",
             )
 
-        # Atomic counter increment
+        # 3. Populate Cache on Miss (Cache-Aside Pattern)
+        if self.cache_service is not None:
+            ttl = None
+            if url_record.expires_at:
+                delta = int((url_record.expires_at - datetime.now(UTC)).total_seconds())
+                if delta > 0:
+                    ttl = delta
+            await self.cache_service.set_url(short_code, url_record.original_url, ttl_seconds=ttl)
+            await self.cache_service.record_click(short_code)
+
+        # 4. Atomic Click Count Increment in Database
         await self.repository.increment_click_count(url_record.id)
         return url_record.original_url
 
@@ -146,10 +177,19 @@ class URLService:
         )
 
     async def delete_url(self, url_id: int) -> None:
-        """Soft-deactivate URL by ID."""
+        """Soft-deactivate URL by ID and invalidate active cache entry."""
+        url_record = await self.repository.get_by_id(url_id)
+        if url_record is None:
+            raise EntityNotFoundException(
+                f"URL with ID {url_id} not found.",
+                code="URL_NOT_FOUND",
+            )
         deleted = await self.repository.soft_delete(url_id)
         if not deleted:
             raise EntityNotFoundException(
                 f"URL with ID {url_id} not found or already deactivated.",
                 code="URL_NOT_FOUND",
             )
+        # Immediate Cache Invalidation
+        if self.cache_service is not None:
+            await self.cache_service.delete_url(url_record.short_code)
