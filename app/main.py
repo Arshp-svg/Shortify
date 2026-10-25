@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from starlette.middleware.base import RequestResponseEndpoint
 
+from app.api.redirect import router as redirect_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.router import api_v1_router
 from app.core.config import get_settings
@@ -87,6 +88,9 @@ app.include_router(health_router)
 
 # Mount versioned API routes
 app.include_router(api_v1_router)
+
+# Mount root redirect handler
+app.include_router(redirect_router)
 
 
 @app.get("/", tags=["Root"])

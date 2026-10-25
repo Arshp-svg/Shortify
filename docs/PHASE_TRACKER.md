@@ -14,8 +14,8 @@
 | **Phase 1** | Requirements, architecture & API contract | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (API contract, architecture diagram, and ADRs documented) |
 | **Phase 2** | FastAPI service skeleton & configuration | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (FastAPI app, health/ready, logging, pool config, 16 unit tests passing) |
 | **Phase 3** | PostgreSQL schema, migrations & repositories | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Alembic migrations, URL repository, unique constraint, race tests, 100k seed, EXPLAIN ANALYZE) |
-| **Phase 4** | Core URL lifecycle & correctness | `IN PROGRESS` | 2026-10-25 | — | Pending lifecycle & concurrency tests |
-| **Phase 5** | Testing strategy & quality gates | `NOT STARTED` | — | — | Pending automated suite & gates |
+| **Phase 4** | Core URL lifecycle & correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Full URL CRUD, 307 redirects, expiration, 50 concurrent clicks tested) |
+| **Phase 5** | Testing strategy & quality gates | `IN PROGRESS` | 2026-10-25 | — | Pending automated suite & gates |
 | **Phase 6** | Baseline deployment & benchmarking | `NOT STARTED` | — | — | Pending reproducible baseline benchmarks |
 | **Phase 7** | Database performance engineering | `NOT STARTED` | — | — | Pending EXPLAIN ANALYZE & optimization report |
 | **Phase 8** | Redis caching & cache correctness | `NOT STARTED` | — | — | Pending cache hit ratio & fail-open proof |
@@ -67,14 +67,14 @@
 - [x] `EXPLAIN ANALYZE` query profiling: Index Scan (0.061 ms) vs Seq Scan (4.987 ms) — 81.75x speedup
 - [x] **Proof of Done:** Migrations apply cleanly up/down; race condition test passes; 100k URLs seeded; EXPLAIN ANALYZE evidence documented in `benchmarks/database/indexing_comparison.md`
 
-### Phase 4: Core URL Lifecycle & Correctness (`NOT STARTED`)
-- [ ] Short URL creation endpoint (`POST /api/v1/urls`) with collision retries
-- [ ] Redirection endpoint (`GET /{short_code}`) with expiration check and atomic click counter
-- [ ] Custom alias validation (regex, minimum length, prohibited keywords)
-- [ ] Soft deletion / deactivation (`DELETE /api/v1/urls/{id}`)
-- [ ] URL statistics endpoint (`GET /api/v1/urls/{id}/stats`)
-- [ ] Concurrency tests: simultaneous identical alias requests, expired URL requests, simultaneous redirect clicks
-- [ ] **Proof of Done:** Full URL lifecycle verified across unit and integration tests
+### Phase 4: Core URL Lifecycle & Correctness (`COMPLETE`)
+- [x] Short URL creation endpoint (`POST /api/v1/urls`) with collision retries
+- [x] Redirection endpoint (`GET /{short_code}`) with expiration check and atomic click counter
+- [x] Custom alias validation (regex, minimum length, prohibited keywords)
+- [x] Soft deletion / deactivation (`DELETE /api/v1/urls/{id}`)
+- [x] URL statistics endpoint (`GET /api/v1/urls/{id}/stats`)
+- [x] Concurrency tests: simultaneous identical alias requests, expired URL requests, simultaneous redirect clicks
+- [x] **Proof of Done:** Full URL lifecycle verified across 35 unit and integration tests; 50 concurrent redirect requests increment counter cleanly
 
 ### Phase 5: Testing Strategy & Quality Gates (`NOT STARTED`)
 - [ ] Unit tests for code generation, validation, expiration, and exception handling

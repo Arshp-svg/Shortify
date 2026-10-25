@@ -59,6 +59,11 @@ ignore = [
     "B008", # Do not perform function call in argument defaults (FastAPI Depends)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ARG001", # Pytest fixtures are injected as function arguments
+]
+
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
 

@@ -41,13 +41,15 @@ async def seed_urls(count: int, batch_size: int = 5000) -> None:
                 idx = batch_start + i
                 code = f"s{idx:07d}"  # Deterministic unique code for fast generation
                 orig = f"https://example.com/products/item-{idx}?source=benchmark&ref=seed"
-                values.append({
-                    "code": code,
-                    "orig": orig,
-                    "created": now_iso,
-                    "clicks": 0,
-                    "active": True,
-                })
+                values.append(
+                    {
+                        "code": code,
+                        "orig": orig,
+                        "created": now_iso,
+                        "clicks": 0,
+                        "active": True,
+                    }
+                )
 
             stmt = text("""
                 INSERT INTO urls (short_code, original_url, created_at, click_count, active)
@@ -62,7 +64,9 @@ async def seed_urls(count: int, batch_size: int = 5000) -> None:
 
     duration = time.perf_counter() - start_time
     rate = total_inserted / duration if duration > 0 else 0
-    print(f"[OK] Seeding completed: {total_inserted:,} URLs inserted in {duration:.2f}s ({rate:,.0f} URLs/sec).")
+    print(
+        f"[OK] Seeding completed: {total_inserted:,} URLs inserted in {duration:.2f}s ({rate:,.0f} URLs/sec)."
+    )
     await engine.dispose()
 
 

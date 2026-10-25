@@ -55,9 +55,7 @@ class URL(Base):
         nullable=False,
     )
 
-    __table_args__ = (
-        Index("ix_urls_active_expires_at", "active", "expires_at"),
-    )
+    __table_args__ = (Index("ix_urls_active_expires_at", "active", "expires_at"),)
 
     @property
     def is_expired(self) -> bool:
