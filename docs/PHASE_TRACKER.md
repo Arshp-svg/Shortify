@@ -101,13 +101,13 @@
 - [x] Deliverable report: `docs/DATABASE_OPTIMIZATION_REPORT.md`
 - [x] **Proof of Done:** Data-backed explanation of index impact and pool tuning with query plans and raw JSON artifacts in `benchmarks/database/`
 
-### Phase 8: Redis Caching & Cache Correctness (`NOT STARTED`)
-- [ ] Implement async Redis cache-aside service (`app/services/cache_service.py`)
-- [ ] Cache redirect lookups with configurable TTL
-- [ ] Implement cache invalidation upon URL update/deactivation
-- [ ] Implement and verify fail-open resilience: graceful degradation to DB when Redis fails
-- [ ] Measure cache hit ratio, Redis latency, and cold vs warm performance
-- [ ] **Proof of Done:** Benchmark proves p99 latency reduction and cache hit ratio under high load
+### Phase 8: Redis Caching & Cache Correctness (`COMPLETE`)
+- [x] Implement async Redis cache-aside service (`app/services/cache_service.py`)
+- [x] Cache redirect lookups with configurable TTL (`min(ttl, expires_in)`)
+- [x] Implement cache invalidation upon URL update/deactivation (`delete_url` evicts `url:{short_code}`)
+- [x] Implement and verify fail-open resilience: graceful degradation to DB when Redis fails
+- [x] Measure cache hit ratio, Redis latency, and cold vs warm performance
+- [x] **Proof of Done:** Benchmark proves p99 latency reduction and cache hit ratio under high load; fail-open confirmed under offline Redis container (0.0% errors); documented in `docs/REDIS_CACHING_REPORT.md`
 
 ### Phase 9: Rate Limiting & Abuse Controls (`NOT STARTED`)
 - [ ] Implement sliding-window rate limiting in Redis (`app/core/rate_limit.py`)
