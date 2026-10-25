@@ -92,7 +92,7 @@ async def async_client(
 
     def override_get_cache_service() -> CacheService:
         return CacheService(
-            redis_client=test_redis_client,  # type: ignore[arg-type]
+            redis_client=test_redis_client,
             default_ttl=300,
             fail_open=True,
             enabled=True,

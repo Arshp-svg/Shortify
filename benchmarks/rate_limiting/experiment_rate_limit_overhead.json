@@ -1,0 +1,30 @@
+{
+  "rate_limit_off": {
+    "requests": 1627,
+    "failures": 0,
+    "rps": 115.68,
+    "p50_latency_ms": 390.0,
+    "p95_latency_ms": 500.0,
+    "p99_latency_ms": 530.0,
+    "avg_latency_ms": 347.4,
+    "error_rate_pct": 0.0
+  },
+  "rate_limit_on": {
+    "requests": 1063,
+    "failures": 0,
+    "rps": 75.61,
+    "p50_latency_ms": 580.0,
+    "p95_latency_ms": 750.0,
+    "p99_latency_ms": 810.0,
+    "avg_latency_ms": 538.51,
+    "error_rate_pct": 0.0
+  },
+  "comparison": {
+    "rps_delta": -40.07,
+    "rps_pct_change": -34.64,
+    "p50_delta_ms": 190.0,
+    "p95_delta_ms": 250.0,
+    "avg_latency_delta_ms": 191.11,
+    "avg_latency_pct_overhead": 55.01
+  }
+}

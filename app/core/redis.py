@@ -1,6 +1,7 @@
 """Async Redis connection management and health monitoring."""
 
 import asyncio
+import contextlib
 import logging
 from typing import Any
 
@@ -51,16 +52,12 @@ async def close_redis() -> None:
     """Gracefully close the Redis client and connection pool."""
     global _redis_client, _redis_pool, _redis_loop
     if _redis_client is not None:
-        try:
+        with contextlib.suppress(Exception):
             await _redis_client.close()
-        except Exception:
-            pass
         _redis_client = None
     if _redis_pool is not None:
-        try:
+        with contextlib.suppress(Exception):
             await _redis_pool.disconnect()
-        except Exception:
-            pass
         _redis_pool = None
     _redis_loop = None
     logger.info("Closed Redis connection pool.")

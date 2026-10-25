@@ -56,7 +56,10 @@ class Settings(BaseSettings):
     # Rate Limiting
     rate_limit_enabled: bool = True
     rate_limit_requests_per_minute: int = 120
-    rate_limit_burst_multiplier: float = 1.5
+    rate_limit_window_seconds: int = 60
+    rate_limit_create_per_minute: int = 60
+    rate_limit_burst_multiplier: float = 1.0
+    rate_limit_fail_open: bool = True
 
     # Observability
     prometheus_metrics_enabled: bool = True

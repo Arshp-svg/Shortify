@@ -19,7 +19,7 @@
 | **Phase 6** | Baseline deployment & benchmarking | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Reproducible baseline benchmarks executed across all 4 workloads, 0.0% errors, report committed) |
 | **Phase 7** | Database performance engineering | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Experiments A, B, and C completed with raw data, EXPLAIN ANALYZE plans, and optimization report) |
 | **Phase 8** | Redis caching & cache correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Redis cache-aside, TTL/invalidation, fail-open resilience under outage, and benchmarks committed) |
-| **Phase 9** | Rate limiting & abuse controls | `NOT STARTED` | — | — | Pending rate limiter & overhead measure |
+| **Phase 9** | Rate limiting & abuse controls | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Sliding-window Lua limiter, HTTP 429 Retry-After, single-IP flood test, microbenchmark, overhead comparison) |
 | **Phase 10**| Observability & dashboards | `NOT STARTED` | — | — | Pending Prometheus metrics & Grafana dashboards |
 | **Phase 11**| Failure testing & resilience | `NOT STARTED` | — | — | Pending fault injection & recovery tests |
 | **Phase 12**| Horizontal scaling & load balancing | `NOT STARTED` | — | — | Pending 1/2/4 replica scaling benchmarks |
@@ -109,12 +109,12 @@
 - [x] Measure cache hit ratio, Redis latency, and cold vs warm performance
 - [x] **Proof of Done:** Benchmark proves p99 latency reduction and cache hit ratio under high load; fail-open confirmed under offline Redis container (0.0% errors); documented in `docs/REDIS_CACHING_REPORT.md`
 
-### Phase 9: Rate Limiting & Abuse Controls (`NOT STARTED`)
-- [ ] Implement sliding-window rate limiting in Redis (`app/core/rate_limit.py`)
-- [ ] Return standard HTTP 429 Too Many Requests with `Retry-After` header
-- [ ] Test burst traffic, multi-client behavior, and Redis downtime fallback
-- [ ] Benchmark endpoint latency with rate limiting enabled vs disabled
-- [ ] **Proof of Done:** Quantified Redis rate-limiting latency overhead
+### Phase 9: Rate Limiting & Abuse Controls (`COMPLETE`)
+- [x] Implement sliding-window rate limiting in Redis (`app/core/rate_limit.py`)
+- [x] Return standard HTTP 429 Too Many Requests with `Retry-After` header
+- [x] Test burst traffic, multi-client behavior, and Redis downtime fallback
+- [x] Benchmark endpoint latency with rate limiting enabled vs disabled
+- [x] **Proof of Done:** Quantified Redis rate-limiting latency overhead (950us p50 microbenchmark, +191ms under 50-user load, documented in `docs/RATE_LIMITING_REPORT.md`)
 
 ### Phase 10: Observability & Dashboards (`NOT STARTED`)
 - [ ] Prometheus metrics middleware for requests, latencies, errors, cache hits/misses, DB queries

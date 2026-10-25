@@ -1,0 +1,60 @@
+{
+  "metadata": {
+    "timestamp": "2026-10-25T12:28:32.823002+00:00",
+    "git_commit": "dd56514",
+    "python_version": "3.12.10",
+    "system": "Windows-11-10.0.26300-SP0",
+    "workload": "MultiClientRedirectUser (50 concurrent users)"
+  },
+  "redis_microbenchmark": {
+    "operations": 2000,
+    "total_duration_seconds": 2.128,
+    "ops_per_second": 939.85,
+    "mean_latency_us": 1057.22,
+    "p50_latency_us": 950.7,
+    "p95_latency_us": 1703.7,
+    "p99_latency_us": 3254.6,
+    "min_latency_us": 597.1,
+    "max_latency_us": 13099.9
+  },
+  "abusive_flood_test": {
+    "client_ip": "198.51.100.99",
+    "total_requests": 150,
+    "allowed_307_count": 120,
+    "rejected_429_count": 30,
+    "mean_allowed_latency_ms": 0.0,
+    "mean_rejected_latency_ms": 75.94,
+    "sample_retry_after": 54,
+    "rate_limiting_enforced": true
+  },
+  "overhead_benchmark": {
+    "rate_limit_off": {
+      "requests": 1627,
+      "failures": 0,
+      "rps": 115.68,
+      "p50_latency_ms": 390.0,
+      "p95_latency_ms": 500.0,
+      "p99_latency_ms": 530.0,
+      "avg_latency_ms": 347.4,
+      "error_rate_pct": 0.0
+    },
+    "rate_limit_on": {
+      "requests": 1063,
+      "failures": 0,
+      "rps": 75.61,
+      "p50_latency_ms": 580.0,
+      "p95_latency_ms": 750.0,
+      "p99_latency_ms": 810.0,
+      "avg_latency_ms": 538.51,
+      "error_rate_pct": 0.0
+    },
+    "comparison": {
+      "rps_delta": -40.07,
+      "rps_pct_change": -34.64,
+      "p50_delta_ms": 190.0,
+      "p95_delta_ms": 250.0,
+      "avg_latency_delta_ms": 191.11,
+      "avg_latency_pct_overhead": 55.01
+    }
+  }
+}

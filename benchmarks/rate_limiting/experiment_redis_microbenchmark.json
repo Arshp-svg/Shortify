@@ -1,0 +1,11 @@
+{
+  "operations": 2000,
+  "total_duration_seconds": 2.128,
+  "ops_per_second": 939.85,
+  "mean_latency_us": 1057.22,
+  "p50_latency_us": 950.7,
+  "p95_latency_us": 1703.7,
+  "p99_latency_us": 3254.6,
+  "min_latency_us": 597.1,
+  "max_latency_us": 13099.9
+}

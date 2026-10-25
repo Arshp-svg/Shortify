@@ -62,12 +62,18 @@ class ValidationException(ShortifyException):
 class RateLimitExceededException(ShortifyException):
     """Raised when rate limit is exceeded."""
 
-    def __init__(self, message: str = "Rate limit exceeded. Please retry later.") -> None:
+    def __init__(
+        self,
+        message: str = "Rate limit exceeded. Please retry later.",
+        retry_after: int = 60,
+    ) -> None:
         super().__init__(
             message=message,
             code="RATE_LIMIT_EXCEEDED",
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            details=[{"retry_after": retry_after}],
         )
+        self.retry_after = retry_after
 
 
 class ServiceUnavailableException(ShortifyException):
@@ -82,7 +88,11 @@ class ServiceUnavailableException(ShortifyException):
 
 
 def _build_error_response(
-    status_code: int, code: str, message: str, details: list[dict[str, Any]] | None = None
+    status_code: int,
+    code: str,
+    message: str,
+    details: list[dict[str, Any]] | None = None,
+    headers: dict[str, str] | None = None,
 ) -> JSONResponse:
     req_id = request_id_ctx.get() or "unknown"
     error_detail = ErrorDetail(
@@ -92,7 +102,7 @@ def _build_error_response(
         details=details or [],
     )
     payload = ErrorResponse(error=error_detail).model_dump(mode="json")
-    return JSONResponse(status_code=status_code, content=payload)
+    return JSONResponse(status_code=status_code, content=payload, headers=headers)
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -106,7 +116,12 @@ def register_exception_handlers(app: FastAPI) -> None:
             exc.message,
             extra={"status": exc.status_code},
         )
-        return _build_error_response(exc.status_code, exc.code, exc.message, exc.details)
+        headers: dict[str, str] = {}
+        if isinstance(exc, RateLimitExceededException):
+            headers["Retry-After"] = str(exc.retry_after)
+        return _build_error_response(
+            exc.status_code, exc.code, exc.message, exc.details, headers=headers
+        )
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_: Request, exc: RequestValidationError) -> JSONResponse:

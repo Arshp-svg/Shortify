@@ -16,6 +16,7 @@ from app.core.config import get_settings
 from app.core.database import close_db_engine
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import request_id_ctx, setup_logging
+from app.core.rate_limit import rate_limit_middleware
 from app.core.redis import close_redis
 
 logger = logging.getLogger("shortify.access")
@@ -84,6 +85,9 @@ async def request_correlation_and_logging_middleware(
     finally:
         request_id_ctx.reset(token)
 
+
+# Rate limiting middleware
+app.middleware("http")(rate_limit_middleware)
 
 # Mount root health/readiness endpoints for orchestrators
 app.include_router(health_router)

@@ -1,0 +1,10 @@
+{
+  "client_ip": "198.51.100.99",
+  "total_requests": 150,
+  "allowed_307_count": 120,
+  "rejected_429_count": 30,
+  "mean_allowed_latency_ms": 0.0,
+  "mean_rejected_latency_ms": 75.94,
+  "sample_retry_after": 54,
+  "rate_limiting_enforced": true
+}

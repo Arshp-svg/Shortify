@@ -148,3 +148,53 @@ class HotKeyUser(FastHttpUser):
                 response.success()
             else:
                 response.failure(f"Expected 307 but got {response.status_code}")
+
+
+class MultiClientRedirectUser(FastHttpUser):
+    """Simulates realistic multi-client redirect traffic with distributed client IPs."""
+
+    wait_time = between(0.005, 0.02)
+    max_seeded_id: ClassVar[int] = 99999
+
+    def on_start(self) -> None:
+        # Assign unique simulated client IP per Locust user instance
+        self.client_ip = f"198.51.{random.randint(1, 250)}.{random.randint(1, 250)}"
+
+    @task
+    def redirect_lookup(self) -> None:
+        idx = random.randint(0, self.max_seeded_id)
+        code = f"s{idx:07d}"
+        headers = {"X-Forwarded-For": self.client_ip}
+        with self.client.get(
+            f"/{code}",
+            headers=headers,
+            name="/{short_code} [Multi-Client Redirect]",
+            allow_redirects=False,
+            catch_response=True,
+        ) as response:
+            if response.status_code == 307 or response.status_code == 429:
+                response.success()
+            else:
+                response.failure(f"Unexpected status: {response.status_code}")
+
+
+class AbusiveClientUser(FastHttpUser):
+    """Simulates an abusive client spamming requests from a single IP to test 429 rate limit enforcement."""
+
+    wait_time = between(0.001, 0.005)
+
+    @task
+    def abusive_spam(self) -> None:
+        headers = {"X-Forwarded-For": "198.51.100.99"}
+        with self.client.get(
+            "/s0000001",
+            headers=headers,
+            name="/{short_code} [Abusive Spam]",
+            allow_redirects=False,
+            catch_response=True,
+        ) as response:
+            if response.status_code in (307, 429):
+                response.success()
+            else:
+                response.failure(f"Unexpected status: {response.status_code}")
+
