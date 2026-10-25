@@ -15,8 +15,8 @@
 | **Phase 2** | FastAPI service skeleton & configuration | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (FastAPI app, health/ready, logging, pool config, 16 unit tests passing) |
 | **Phase 3** | PostgreSQL schema, migrations & repositories | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Alembic migrations, URL repository, unique constraint, race tests, 100k seed, EXPLAIN ANALYZE) |
 | **Phase 4** | Core URL lifecycle & correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Full URL CRUD, 307 redirects, expiration, 50 concurrent clicks tested) |
-| **Phase 5** | Testing strategy & quality gates | `IN PROGRESS` | 2026-10-25 | — | Pending automated suite & gates |
-| **Phase 6** | Baseline deployment & benchmarking | `NOT STARTED` | — | — | Pending reproducible baseline benchmarks |
+| **Phase 5** | Testing strategy & quality gates | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (38 automated unit & integration tests, Postman contract collection, Ruff/mypy/Bandit quality gates) |
+| **Phase 6** | Baseline deployment & benchmarking | `IN PROGRESS` | 2026-10-25 | — | Pending reproducible baseline benchmarks |
 | **Phase 7** | Database performance engineering | `NOT STARTED` | — | — | Pending EXPLAIN ANALYZE & optimization report |
 | **Phase 8** | Redis caching & cache correctness | `NOT STARTED` | — | — | Pending cache hit ratio & fail-open proof |
 | **Phase 9** | Rate limiting & abuse controls | `NOT STARTED` | — | — | Pending rate limiter & overhead measure |
@@ -76,13 +76,13 @@
 - [x] Concurrency tests: simultaneous identical alias requests, expired URL requests, simultaneous redirect clicks
 - [x] **Proof of Done:** Full URL lifecycle verified across 35 unit and integration tests; 50 concurrent redirect requests increment counter cleanly
 
-### Phase 5: Testing Strategy & Quality Gates (`NOT STARTED`)
-- [ ] Unit tests for code generation, validation, expiration, and exception handling
-- [ ] Real PostgreSQL integration tests for transactions and persistence
-- [ ] Postman / Newman collection for API contract and smoke tests
-- [ ] Quality gates passing: Ruff (lint & format), mypy (strict type checking), Bandit (security scan)
-- [ ] CI pipeline configured to block merges on any failure
-- [ ] **Proof of Done:** Test suite passes cleanly; 100% of critical paths covered
+### Phase 5: Testing Strategy & Quality Gates (`COMPLETE`)
+- [x] Unit tests for code generation, validation, expiration, and exception handling
+- [x] Real PostgreSQL integration tests for transactions and persistence
+- [x] Postman / Newman collection for API contract and smoke tests (`tests/contract/shortify_postman_collection.json`)
+- [x] Quality gates passing: Ruff (lint & format), mypy (strict type checking), Bandit (security scan), pip-audit (CVE scan)
+- [x] CI pipeline configured to block merges on any failure
+- [x] **Proof of Done:** 38 tests passing (100% pass rate, 83% line coverage); zero static lint or type errors; zero security vulnerabilities
 
 ### Phase 6: Baseline Deployment & Benchmarking (`NOT STARTED`)
 - [ ] Implement Locust load testing suite (`load_tests/locustfile.py`)

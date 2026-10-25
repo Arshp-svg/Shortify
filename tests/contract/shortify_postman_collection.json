@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Shortify API Contract & Smoke Collection",
+    "description": "Automated API contract validation and smoke test suite for Shortify.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "createdShortCode",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdUrlId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Liveness Probe",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Status is ok', function () { var jsonData = pm.response.json(); pm.expect(jsonData.status).to.eql('ok'); });",
+              "pm.test('Has X-Request-ID header', function () { pm.expect(pm.response.headers.has('X-Request-ID')).to.be.true; });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Readiness Probe",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/ready",
+          "host": ["{{baseUrl}}"],
+          "path": ["ready"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Database is connected', function () { var data = pm.response.json(); pm.expect(data.checks.database).to.eql('connected'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Create Short URL",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"original_url\": \"https://github.com/fastapi/fastapi\", \"custom_alias\": \"contract-test-alias\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/urls",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "urls"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+              "var data = pm.response.json();",
+              "pm.collectionVariables.set('createdShortCode', data.short_code);",
+              "pm.collectionVariables.set('createdUrlId', data.id.toString());",
+              "pm.test('Payload matches URLResponse schema', function () {",
+              "  pm.expect(data).to.have.property('id');",
+              "  pm.expect(data).to.have.property('short_code');",
+              "  pm.expect(data).to.have.property('short_url');",
+              "  pm.expect(data.click_count).to.eql(0);",
+              "  pm.expect(data.active).to.be.true;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Redirect Short URL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/{{createdShortCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["{{createdShortCode}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 307 Temporary Redirect', function () { pm.response.to.have.status(307); });",
+              "pm.test('Location header points to original destination', function () {",
+              "  pm.expect(pm.response.headers.get('Location')).to.eql('https://github.com/fastapi/fastapi');",
+              "});",
+              "pm.test('Cache-Control is no-cache', function () {",
+              "  pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-cache');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Get URL Stats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/urls/{{createdUrlId}}/stats",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "urls", "{{createdUrlId}}", "stats"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+              "var data = pm.response.json();",
+              "pm.test('Click count incremented to 1', function () {",
+              "  pm.expect(data.click_count).to.be.at.least(1);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Deactivate URL",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/urls/{{createdUrlId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "urls", "{{createdUrlId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 204 No Content', function () { pm.response.to.have.status(204); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Redirect Deactivated Short Code Returns 410",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/{{createdShortCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["{{createdShortCode}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 410 Gone', function () { pm.response.to.have.status(410); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
