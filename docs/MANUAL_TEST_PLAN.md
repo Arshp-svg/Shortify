@@ -53,9 +53,9 @@ This document catalogs all tests requiring human verification or interactive exe
 - **Pass/Fail Criteria:** All containers reach `healthy` / `running` status.
 - **Evidence to Capture:** Output of `docker compose ps`.
 - **Cleanup / Recovery:** `docker compose down -v`
-- **User Observed Result:** `[PENDING USER EXECUTION]`
-- **User Evidence:** `[PENDING]`
-- **Status:** `NOT TESTED`
+- **User Observed Result:** `docker compose up -d --build` completed with code 0. All containers created and started: `shortify-postgres` (Healthy), `shortify-redis` (Healthy), `shortify-api` (Started), `shortify-prometheus` (Started), `shortify-grafana` (Started).
+- **User Evidence:** Container startup logged: `Image shortify-api Built (77.8s)`, `shortify-postgres Healthy (1.2s)`, `shortify-redis Healthy (1.2s)`.
+- **Status:** `MANUALLY VERIFIED`
 
 ---
 
@@ -145,6 +145,6 @@ This document catalogs all tests requiring human verification or interactive exe
 - **Pass/Fail Criteria:** Redirect functions in modern browser without TLS or header errors.
 - **Evidence to Capture:** Browser address bar final destination and stats JSON payload.
 - **Cleanup / Recovery:** N/A.
-- **User Observed Result:** `[PENDING USER EXECUTION]`
-- **User Evidence:** `[PENDING]`
-- **Status:** `NOT TESTED`
+- **User Observed Result:** User executed `curl -Method POST` creating alias `fastapi` pointing to `https://fastapi.tiangolo.com` (HTTP 201 Created, `x-request-id: 4f71a310-02fb-4a5b-bc01-d72468b06b68`). Subsequent verification of stats endpoint `curl http://localhost:8000/api/v1/urls/1/stats` returned HTTP 200 OK with `click_count: 1` (`x-request-id: db272750-8207-439a-bbc2-eeea319c46dc`).
+- **User Evidence:** Terminal outputs for 201 Created and 200 OK stats with click count incremented from 0 to 1.
+- **Status:** `MANUALLY VERIFIED`
