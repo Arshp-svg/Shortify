@@ -1,0 +1,157 @@
+# Shortify — Phase Progress Tracker
+
+**Authoritative Specification:** `Shortify_Project_1_Engineering_Roadmap.pdf`  
+**Governing Standard:** `AGENTS.md`  
+**Last Updated:** 2026-10-25
+
+---
+
+## 1. High-Level Phase Overview
+
+| Phase | Focus | Status | Start Date | Completion Date | Exit Condition Met? |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Phase 0** | Engineering setup & workflow | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Repository clean, CI authored, Ruff/mypy/pytest passing, Docker compose validated) |
+| **Phase 1** | Requirements, architecture & API contract | `IN PROGRESS` | 2026-10-25 | — | Pending API contract & architecture doc |
+| **Phase 2** | FastAPI service skeleton & configuration | `NOT STARTED` | — | — | Pending skeleton & health checks |
+| **Phase 3** | PostgreSQL schema, migrations & repositories | `NOT STARTED` | — | — | Pending migrations & race tests |
+| **Phase 4** | Core URL lifecycle & correctness | `NOT STARTED` | — | — | Pending lifecycle & concurrency tests |
+| **Phase 5** | Testing strategy & quality gates | `NOT STARTED` | — | — | Pending automated suite & gates |
+| **Phase 6** | Baseline deployment & benchmarking | `NOT STARTED` | — | — | Pending reproducible baseline benchmarks |
+| **Phase 7** | Database performance engineering | `NOT STARTED` | — | — | Pending EXPLAIN ANALYZE & optimization report |
+| **Phase 8** | Redis caching & cache correctness | `NOT STARTED` | — | — | Pending cache hit ratio & fail-open proof |
+| **Phase 9** | Rate limiting & abuse controls | `NOT STARTED` | — | — | Pending rate limiter & overhead measure |
+| **Phase 10**| Observability & dashboards | `NOT STARTED` | — | — | Pending Prometheus metrics & Grafana dashboards |
+| **Phase 11**| Failure testing & resilience | `NOT STARTED` | — | — | Pending fault injection & recovery tests |
+| **Phase 12**| Horizontal scaling & load balancing | `NOT STARTED` | — | — | Pending 1/2/4 replica scaling benchmarks |
+| **Phase 13**| Benchmark automation & regression detection | `NOT STARTED` | — | — | Pending automated benchmark CI rule |
+| **Phase 14**| Security, documentation & release | `NOT STARTED` | — | — | Pending security audit & release runbook |
+| **Phase 15**| Final benchmark report & resume evidence | `NOT STARTED` | — | — | Pending final evidence report |
+
+---
+
+## 2. Granular Milestone Checklist
+
+### Phase 0: Engineering Setup & Workflow (`COMPLETE`)
+- [x] Initialize Git repository and add comprehensive `.gitignore`
+- [x] Define `pyproject.toml` with pinned Python 3.12+, FastAPI, SQLAlchemy, Alembic, Redis, Ruff, mypy, pytest, Locust
+- [x] Create `.env.example` with zero hardcoded production secrets
+- [x] Create multi-stage `Dockerfile` and `docker-compose.yml` (API, PostgreSQL, Redis, Prometheus, Grafana)
+- [x] Create `Makefile` and cross-platform PowerShell runner scripts (`run`, `test`, `lint`, `typecheck`, `load-test`, `benchmark`)
+- [x] Configure GitHub Actions workflow (`.github/workflows/ci.yml`) for linting, type checks, tests, and smoke tests
+- [x] Add `.pre-commit-config.yaml` for Ruff formatting and credential checks
+- [x] **Proof of Done:** `pytest` passed (2/2 tests), `ruff` clean (0 errors), `mypy` clean (0 errors), `bandit` clean (0 issues), `docker compose config` valid (code 0)
+
+### Phase 1: Requirements, Architecture & API Contract (`NOT STARTED`)
+- [ ] Document complete API contract (`docs/API_CONTRACT.md`) with request/response schemas and status codes
+- [ ] Document Architecture diagram (`docs/ARCHITECTURE.md`) showing unoptimized baseline (FastAPI + PostgreSQL)
+- [ ] Document Architectural Decision Records (`docs/DECISIONS.md`) for 307 vs 302, Base62 collisions, atomic counters, UTC expiration
+- [ ] **Proof of Done:** Reviewed and ratified architectural documents before substantive code implementation
+
+### Phase 2: FastAPI Service Skeleton & Configuration (`NOT STARTED`)
+- [ ] Settings management via `pydantic-settings` (`app/core/config.py`)
+- [ ] Versioned API router structure (`app/api/v1/router.py`)
+- [ ] Centralized exception handling with standard JSON error envelopes (`app/core/exceptions.py`)
+- [ ] Structured JSON logging with `request_id` correlation middleware (`app/core/logging.py`)
+- [ ] Implement liveness `/health` and readiness `/ready` endpoints
+- [ ] Dependency injection architecture for database sessions and services (`app/api/deps.py`)
+- [ ] Deliberate async connection pool configuration (pool size, max overflow, recycle time)
+- [ ] **Proof of Done:** Automated health/readiness tests pass, structured log format verified
+
+### Phase 3: PostgreSQL Schema, Migrations & Repositories (`NOT STARTED`)
+- [ ] SQLAlchemy declarative `URL` entity model
+- [ ] Alembic environment and initial migration for `urls` table
+- [ ] Unique constraint on `short_code` and lookup indexes
+- [ ] `URLRepository` implementation with clean async database queries
+- [ ] Concurrency test verifying DB constraint prevents duplicate custom aliases (`tests/integration/test_concurrency.py`)
+- [ ] Seeding script for 100k+ realistic URLs (`scripts/seed_urls.py`)
+- [ ] `EXPLAIN ANALYZE` and `pg_stat_statements` initial query profiling
+- [ ] **Proof of Done:** Migrations apply cleanly up and down; race condition test passes
+
+### Phase 4: Core URL Lifecycle & Correctness (`NOT STARTED`)
+- [ ] Short URL creation endpoint (`POST /api/v1/urls`) with collision retries
+- [ ] Redirection endpoint (`GET /{short_code}`) with expiration check and atomic click counter
+- [ ] Custom alias validation (regex, minimum length, prohibited keywords)
+- [ ] Soft deletion / deactivation (`DELETE /api/v1/urls/{id}`)
+- [ ] URL statistics endpoint (`GET /api/v1/urls/{id}/stats`)
+- [ ] Concurrency tests: simultaneous identical alias requests, expired URL requests, simultaneous redirect clicks
+- [ ] **Proof of Done:** Full URL lifecycle verified across unit and integration tests
+
+### Phase 5: Testing Strategy & Quality Gates (`NOT STARTED`)
+- [ ] Unit tests for code generation, validation, expiration, and exception handling
+- [ ] Real PostgreSQL integration tests for transactions and persistence
+- [ ] Postman / Newman collection for API contract and smoke tests
+- [ ] Quality gates passing: Ruff (lint & format), mypy (strict type checking), Bandit (security scan)
+- [ ] CI pipeline configured to block merges on any failure
+- [ ] **Proof of Done:** Test suite passes cleanly; 100% of critical paths covered
+
+### Phase 6: Baseline Deployment & Benchmarking (`NOT STARTED`)
+- [ ] Implement Locust load testing suite (`load_tests/locustfile.py`)
+- [ ] Execute baseline benchmarks on unoptimized FastAPI + PostgreSQL
+- [ ] Measure 5 workloads: Redirect-heavy, Creation-heavy, Mixed (90/10), 404/invalid, Burst
+- [ ] Record hardware, commit hash, RPS, p50/p95/p99 latency, error rate, CPU/RAM, DB connections
+- [ ] Store raw benchmark data in `benchmarks/baseline/`
+- [ ] **Proof of Done:** Reproducible baseline benchmark report committed with raw data
+
+### Phase 7: Database Performance Engineering (`NOT STARTED`)
+- [ ] Experiment A: Benchmark across dataset sizes (10k, 100k, 1M)
+- [ ] Experiment B: Benchmark with vs without `short_code` index; compare `EXPLAIN ANALYZE` plans
+- [ ] Experiment C: Benchmark connection pool sizes (5, 20, 50, 100) to find saturation point
+- [ ] Deliverable report: `docs/DATABASE_OPTIMIZATION_REPORT.md`
+- [ ] **Proof of Done:** Data-backed explanation of index impact and pool tuning with query plans
+
+### Phase 8: Redis Caching & Cache Correctness (`NOT STARTED`)
+- [ ] Implement async Redis cache-aside service (`app/services/cache_service.py`)
+- [ ] Cache redirect lookups with configurable TTL
+- [ ] Implement cache invalidation upon URL update/deactivation
+- [ ] Implement and verify fail-open resilience: graceful degradation to DB when Redis fails
+- [ ] Measure cache hit ratio, Redis latency, and cold vs warm performance
+- [ ] **Proof of Done:** Benchmark proves p99 latency reduction and cache hit ratio under high load
+
+### Phase 9: Rate Limiting & Abuse Controls (`NOT STARTED`)
+- [ ] Implement sliding-window rate limiting in Redis (`app/core/rate_limit.py`)
+- [ ] Return standard HTTP 429 Too Many Requests with `Retry-After` header
+- [ ] Test burst traffic, multi-client behavior, and Redis downtime fallback
+- [ ] Benchmark endpoint latency with rate limiting enabled vs disabled
+- [ ] **Proof of Done:** Quantified Redis rate-limiting latency overhead
+
+### Phase 10: Observability & Dashboards (`NOT STARTED`)
+- [ ] Prometheus metrics middleware for requests, latencies, errors, cache hits/misses, DB queries
+- [ ] Grafana dashboard configuration for real-time visualization
+- [ ] Enrich structured JSON logs with correlation IDs and performance timings
+- [ ] **Proof of Done:** Live traffic visual inspection on Grafana dashboard
+
+### Phase 11: Failure Testing & Resilience (`NOT STARTED`)
+- [ ] Chaos experiment 1: Stop Redis during peak redirect load (verify fail-open to DB)
+- [ ] Chaos experiment 2: Stop PostgreSQL (verify clean 503 response and health check change)
+- [ ] Chaos experiment 3: Restart API instance under load (measure recovery time)
+- [ ] Chaos experiment 4: Saturate DB connection pool (verify connection timeout handling)
+- [ ] Publish `docs/FAILURE_EXPERIMENTS.md` with incident logs and recovery metrics
+- [ ] **Proof of Done:** All failure modes tested and documented with verifiable recovery procedures
+
+### Phase 12: Horizontal Scaling & Load Balancing (`NOT STARTED`)
+- [ ] Deploy Nginx reverse proxy with round-robin upstream load balancing
+- [ ] Deploy 1, 2, and 4 FastAPI API replicas
+- [ ] Run comparative scaling benchmark keeping DB/cache fixed
+- [ ] Identify and document the point where scaling becomes sublinear (shared DB/Redis bottleneck)
+- [ ] **Proof of Done:** 1 vs 2 vs 4 replica throughput comparison chart and bottleneck analysis
+
+### Phase 13: Benchmark Automation & Regression Detection (`NOT STARTED`)
+- [ ] Build automated test runner script `scripts/run_benchmarks.py`
+- [ ] Define automated CI rule warning or failing on >15% p95 latency regression
+- [ ] Split CI: fast pull-request tests vs scheduled nightly benchmark suite
+- [ ] **Proof of Done:** Automated script generates raw CSV and regression delta report
+
+### Phase 14: Security, Documentation & Release (`NOT STARTED`)
+- [ ] Validate URL schemes (block `file://`, `javascript:`, private IP SSRF attempts)
+- [ ] Run Bandit static analyzer and `pip-audit` dependency check
+- [ ] Verify zero committed secrets via pre-commit and Git history check
+- [ ] Author production `README.md` and operations `docs/RUNBOOK.md`
+- [ ] Tag release version (`v1.0.0`)
+- [ ] **Proof of Done:** Clean security scan reports; reproducible deployment from scratch
+
+### Phase 15: Final Benchmark Report & Resume Evidence (`NOT STARTED`)
+- [ ] Author `docs/FINAL_BENCHMARK_REPORT.md` compiling all 13 required sections
+- [ ] Generate comparative charts (throughput, p95/p99 latency, DB vs Redis, 1 vs 2 vs 4 replicas)
+- [ ] Formulate exact, measured resume bullet points without any invented figures
+- [ ] Review final Definition of Done checklist
+- [ ] **Proof of Done:** All checklist items checked with attached evidence artifacts

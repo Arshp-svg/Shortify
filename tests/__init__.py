@@ -1,0 +1,1 @@
+"""Shortify test suite."""
