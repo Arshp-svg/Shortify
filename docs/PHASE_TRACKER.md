@@ -12,8 +12,8 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Phase 0** | Engineering setup & workflow | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Repository clean, CI authored, Ruff/mypy/pytest passing, Docker compose validated) |
 | **Phase 1** | Requirements, architecture & API contract | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (API contract, architecture diagram, and ADRs documented) |
-| **Phase 2** | FastAPI service skeleton & configuration | `IN PROGRESS` | 2026-10-25 | — | Pending skeleton & health checks |
-| **Phase 3** | PostgreSQL schema, migrations & repositories | `NOT STARTED` | — | — | Pending migrations & race tests |
+| **Phase 2** | FastAPI service skeleton & configuration | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (FastAPI app, health/ready, logging, pool config, 16 unit tests passing) |
+| **Phase 3** | PostgreSQL schema, migrations & repositories | `IN PROGRESS` | 2026-10-25 | — | Pending migrations & race tests |
 | **Phase 4** | Core URL lifecycle & correctness | `NOT STARTED` | — | — | Pending lifecycle & concurrency tests |
 | **Phase 5** | Testing strategy & quality gates | `NOT STARTED` | — | — | Pending automated suite & gates |
 | **Phase 6** | Baseline deployment & benchmarking | `NOT STARTED` | — | — | Pending reproducible baseline benchmarks |
@@ -47,15 +47,15 @@
 - [x] Document Architectural Decision Records (`docs/DECISIONS.md`) for 307 vs 302, Base62 collisions, atomic counters, UTC expiration
 - [x] **Proof of Done:** Reviewed and ratified architectural documents before substantive code implementation
 
-### Phase 2: FastAPI Service Skeleton & Configuration (`NOT STARTED`)
-- [ ] Settings management via `pydantic-settings` (`app/core/config.py`)
-- [ ] Versioned API router structure (`app/api/v1/router.py`)
-- [ ] Centralized exception handling with standard JSON error envelopes (`app/core/exceptions.py`)
-- [ ] Structured JSON logging with `request_id` correlation middleware (`app/core/logging.py`)
-- [ ] Implement liveness `/health` and readiness `/ready` endpoints
-- [ ] Dependency injection architecture for database sessions and services (`app/api/deps.py`)
-- [ ] Deliberate async connection pool configuration (pool size, max overflow, recycle time)
-- [ ] **Proof of Done:** Automated health/readiness tests pass, structured log format verified
+### Phase 2: FastAPI Service Skeleton & Configuration (`COMPLETE`)
+- [x] Settings management via `pydantic-settings` (`app/core/config.py`)
+- [x] Versioned API router structure (`app/api/v1/router.py`)
+- [x] Centralized exception handling with standard JSON error envelopes (`app/core/exceptions.py`)
+- [x] Structured JSON logging with `request_id` correlation middleware (`app/core/logging.py`)
+- [x] Implement liveness `/health` and readiness `/ready` endpoints
+- [x] Dependency injection architecture for database sessions and services (`app/api/deps.py`)
+- [x] Deliberate async connection pool configuration (pool size, max overflow, recycle time)
+- [x] **Proof of Done:** Automated health/readiness tests pass, structured log format verified, 16 unit tests passing cleanly
 
 ### Phase 3: PostgreSQL Schema, Migrations & Repositories (`NOT STARTED`)
 - [ ] SQLAlchemy declarative `URL` entity model
