@@ -17,7 +17,7 @@
 | **Phase 4** | Core URL lifecycle & correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Full URL CRUD, 307 redirects, expiration, 50 concurrent clicks tested) |
 | **Phase 5** | Testing strategy & quality gates | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (38 automated unit & integration tests, Postman contract collection, Ruff/mypy/Bandit quality gates) |
 | **Phase 6** | Baseline deployment & benchmarking | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Reproducible baseline benchmarks executed across all 4 workloads, 0.0% errors, report committed) |
-| **Phase 7** | Database performance engineering | `NOT STARTED` | — | — | Pending EXPLAIN ANALYZE & optimization report |
+| **Phase 7** | Database performance engineering | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Experiments A, B, and C completed with raw data, EXPLAIN ANALYZE plans, and optimization report) |
 | **Phase 8** | Redis caching & cache correctness | `NOT STARTED` | — | — | Pending cache hit ratio & fail-open proof |
 | **Phase 9** | Rate limiting & abuse controls | `NOT STARTED` | — | — | Pending rate limiter & overhead measure |
 | **Phase 10**| Observability & dashboards | `NOT STARTED` | — | — | Pending Prometheus metrics & Grafana dashboards |
@@ -94,12 +94,12 @@
 - [x] Author comprehensive Baseline Benchmark Report (`benchmarks/baseline/BASELINE_BENCHMARK_REPORT.md`)
 - [x] **Proof of Done:** Complete, reproducible baseline benchmark suite and report committed with raw data and bottleneck identification
 
-### Phase 7: Database Performance Engineering (`NOT STARTED`)
-- [ ] Experiment A: Benchmark across dataset sizes (10k, 100k, 1M)
-- [ ] Experiment B: Benchmark with vs without `short_code` index; compare `EXPLAIN ANALYZE` plans
-- [ ] Experiment C: Benchmark connection pool sizes (5, 20, 50, 100) to find saturation point
-- [ ] Deliverable report: `docs/DATABASE_OPTIMIZATION_REPORT.md`
-- [ ] **Proof of Done:** Data-backed explanation of index impact and pool tuning with query plans
+### Phase 7: Database Performance Engineering (`COMPLETE`)
+- [x] Experiment A: Benchmark across dataset sizes (10k, 100k, 1M) showing $O(\log N)$ index scan vs $O(N)$ seq scan
+- [x] Experiment B: Benchmark with vs without `short_code` index; compare `EXPLAIN ANALYZE` plans and buffer reads
+- [x] Experiment C: Benchmark connection pool sizes (5, 20, 50, 100) under 50-user load to find saturation and penalty point
+- [x] Deliverable report: `docs/DATABASE_OPTIMIZATION_REPORT.md`
+- [x] **Proof of Done:** Data-backed explanation of index impact and pool tuning with query plans and raw JSON artifacts in `benchmarks/database/`
 
 ### Phase 8: Redis Caching & Cache Correctness (`NOT STARTED`)
 - [ ] Implement async Redis cache-aside service (`app/services/cache_service.py`)

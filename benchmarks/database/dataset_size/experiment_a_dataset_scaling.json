@@ -1,0 +1,30 @@
+{
+  "timestamp_utc": "2026-10-25T08:41:16.633239+00:00",
+  "experiment": "Experiment A: Dataset Size Scaling",
+  "scales_evaluated": [
+    {
+      "scale_rows": 10000,
+      "table_name": "urls_10k",
+      "index_scan_ms": 0.13,
+      "seq_scan_ms": 1.913,
+      "speedup": 14.72,
+      "size_metrics": "1536 kB|328 kB|1872 kB"
+    },
+    {
+      "scale_rows": 100000,
+      "table_name": "urls",
+      "index_scan_ms": 6.808,
+      "seq_scan_ms": 19.801,
+      "speedup": 2.91,
+      "size_metrics": "13 MB|9712 kB|23 MB"
+    },
+    {
+      "scale_rows": 1000000,
+      "table_name": "urls",
+      "index_scan_ms": 0.136,
+      "seq_scan_ms": 88.391,
+      "speedup": 649.93,
+      "size_metrics": "135 MB|94 MB|229 MB"
+    }
+  ]
+}

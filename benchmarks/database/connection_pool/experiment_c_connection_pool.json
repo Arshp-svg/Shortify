@@ -1,0 +1,76 @@
+{
+  "timestamp_utc": "2026-10-25T08:46:17.309367+00:00",
+  "experiment": "Experiment C: Connection Pool Tuning",
+  "concurrency": 50,
+  "duration_seconds": 15,
+  "results": [
+    {
+      "configuration": {
+        "pool_size": 5,
+        "overflow": 0,
+        "label": "Pool-5 (Constrained)"
+      },
+      "metrics": {
+        "total_requests": 2161.0,
+        "failed_requests": 0.0,
+        "rps": 149.53,
+        "p50_ms": 270.0,
+        "p95_ms": 740.0,
+        "p99_ms": 1000.0,
+        "avg_latency_ms": 271.63,
+        "error_rate_pct": 0.0
+      }
+    },
+    {
+      "configuration": {
+        "pool_size": 20,
+        "overflow": 10,
+        "label": "Pool-20 (Baseline)"
+      },
+      "metrics": {
+        "total_requests": 2214.0,
+        "failed_requests": 0.0,
+        "rps": 157.5,
+        "p50_ms": 260.0,
+        "p95_ms": 380.0,
+        "p99_ms": 460.0,
+        "avg_latency_ms": 252.28,
+        "error_rate_pct": 0.0
+      }
+    },
+    {
+      "configuration": {
+        "pool_size": 50,
+        "overflow": 10,
+        "label": "Pool-50 (Right-Sized)"
+      },
+      "metrics": {
+        "total_requests": 2596.0,
+        "failed_requests": 0.0,
+        "rps": 184.55,
+        "p50_ms": 230.0,
+        "p95_ms": 290.0,
+        "p99_ms": 330.0,
+        "avg_latency_ms": 214.22,
+        "error_rate_pct": 0.0
+      }
+    },
+    {
+      "configuration": {
+        "pool_size": 100,
+        "overflow": 20,
+        "label": "Pool-100 (Oversized)"
+      },
+      "metrics": {
+        "total_requests": 2362.0,
+        "failed_requests": 0.0,
+        "rps": 162.79,
+        "p50_ms": 260.0,
+        "p95_ms": 350.0,
+        "p99_ms": 580.0,
+        "avg_latency_ms": 248.44,
+        "error_rate_pct": 0.0
+      }
+    }
+  ]
+}
