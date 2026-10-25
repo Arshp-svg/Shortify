@@ -11,8 +11,8 @@
 | Phase | Focus | Status | Start Date | Completion Date | Exit Condition Met? |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Phase 0** | Engineering setup & workflow | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Repository clean, CI authored, Ruff/mypy/pytest passing, Docker compose validated) |
-| **Phase 1** | Requirements, architecture & API contract | `IN PROGRESS` | 2026-10-25 | — | Pending API contract & architecture doc |
-| **Phase 2** | FastAPI service skeleton & configuration | `NOT STARTED` | — | — | Pending skeleton & health checks |
+| **Phase 1** | Requirements, architecture & API contract | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (API contract, architecture diagram, and ADRs documented) |
+| **Phase 2** | FastAPI service skeleton & configuration | `IN PROGRESS` | 2026-10-25 | — | Pending skeleton & health checks |
 | **Phase 3** | PostgreSQL schema, migrations & repositories | `NOT STARTED` | — | — | Pending migrations & race tests |
 | **Phase 4** | Core URL lifecycle & correctness | `NOT STARTED` | — | — | Pending lifecycle & concurrency tests |
 | **Phase 5** | Testing strategy & quality gates | `NOT STARTED` | — | — | Pending automated suite & gates |
@@ -41,11 +41,11 @@
 - [x] Add `.pre-commit-config.yaml` for Ruff formatting and credential checks
 - [x] **Proof of Done:** `pytest` passed (2/2 tests), `ruff` clean (0 errors), `mypy` clean (0 errors), `bandit` clean (0 issues), `docker compose config` valid (code 0)
 
-### Phase 1: Requirements, Architecture & API Contract (`NOT STARTED`)
-- [ ] Document complete API contract (`docs/API_CONTRACT.md`) with request/response schemas and status codes
-- [ ] Document Architecture diagram (`docs/ARCHITECTURE.md`) showing unoptimized baseline (FastAPI + PostgreSQL)
-- [ ] Document Architectural Decision Records (`docs/DECISIONS.md`) for 307 vs 302, Base62 collisions, atomic counters, UTC expiration
-- [ ] **Proof of Done:** Reviewed and ratified architectural documents before substantive code implementation
+### Phase 1: Requirements, Architecture & API Contract (`COMPLETE`)
+- [x] Document complete API contract (`docs/API_CONTRACT.md`) with request/response schemas and status codes
+- [x] Document Architecture diagram (`docs/ARCHITECTURE.md`) showing unoptimized baseline (FastAPI + PostgreSQL)
+- [x] Document Architectural Decision Records (`docs/DECISIONS.md`) for 307 vs 302, Base62 collisions, atomic counters, UTC expiration
+- [x] **Proof of Done:** Reviewed and ratified architectural documents before substantive code implementation
 
 ### Phase 2: FastAPI Service Skeleton & Configuration (`NOT STARTED`)
 - [ ] Settings management via `pydantic-settings` (`app/core/config.py`)
