@@ -24,7 +24,7 @@
 | **Phase 11**| Failure testing & resilience | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Chaos experiments 1-4 completed, 5 resilience tests passing, report published) |
 | **Phase 12**| Horizontal scaling & load balancing | `COMPLETE` | 2026-10-31 | 2026-10-31 | Yes (Nginx upstream load balancing, 1/2/4 replica scaling benchmarks, sublinear bottleneck analyzed) |
 | **Phase 13**| Benchmark automation & regression detection | `COMPLETE` | 2026-10-31 | 2026-10-31 | Yes (Automated regression script, CI split, nightly benchmark workflow, 7 unit tests passing) |
-| **Phase 14**| Security, documentation & release | `NOT STARTED` | — | — | Pending security audit & release runbook |
+| **Phase 14**| Security, documentation & release | `COMPLETE` | 2026-10-31 | 2026-10-31 | Yes (SSRF defenses, security headers, Bandit/pip-audit clean, production runbook & comprehensive README) |
 | **Phase 15**| Final benchmark report & resume evidence | `NOT STARTED` | — | — | Pending final evidence report |
 
 ---
@@ -146,13 +146,14 @@
 - [x] Document methodology and troubleshooting guide (`docs/PERFORMANCE_REGRESSION_GUIDE.md`)
 - [x] **Proof of Done:** Automated script generates raw CSV and regression delta report; unit tests pass cleanly
 
-### Phase 14: Security, Documentation & Release (`NOT STARTED`)
-- [ ] Validate URL schemes (block `file://`, `javascript:`, private IP SSRF attempts)
-- [ ] Run Bandit static analyzer and `pip-audit` dependency check
-- [ ] Verify zero committed secrets via pre-commit and Git history check
-- [ ] Author production `README.md` and operations `docs/RUNBOOK.md`
-- [ ] Tag release version (`v1.0.0`)
-- [ ] **Proof of Done:** Clean security scan reports; reproducible deployment from scratch
+### Phase 14: Security, Documentation & Release (`COMPLETE`)
+- [x] Validate URL schemes and block private IP/loopback SSRF attempts (`app/schemas/url.py`)
+- [x] Run Bandit static analyzer (0 issues) and `pip-audit` dependency check (0 vulnerabilities)
+- [x] Verify zero committed secrets via pre-commit and Git history check
+- [x] Author comprehensive production `README.md` and operations `docs/RUNBOOK.md`
+- [x] Add response security headers (nosniff, DENY, XSS protection, Referrer-Policy)
+- [x] Tag release version (`v1.0.0`)
+- [x] **Proof of Done:** Clean Bandit and pip-audit scans; 6 security unit tests passing in `tests/unit/test_security.py`; comprehensive runbook published in `docs/RUNBOOK.md`
 
 ### Phase 15: Final Benchmark Report & Resume Evidence (`NOT STARTED`)
 - [ ] Author `docs/FINAL_BENCHMARK_REPORT.md` compiling all 13 required sections

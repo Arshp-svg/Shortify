@@ -82,6 +82,10 @@ async def request_correlation_and_logging_middleware(
         )
 
         response.headers["X-Request-ID"] = req_id
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         return response
     finally:
         request_id_ctx.reset(token)

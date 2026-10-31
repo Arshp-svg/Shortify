@@ -1,5 +1,6 @@
 """Pydantic schemas for URL operations, analytics, and health checks."""
 
+import ipaddress
 from datetime import UTC, datetime
 from typing import Annotated
 
@@ -42,9 +43,28 @@ class URLCreateRequest(BaseModel):
     @field_validator("original_url")
     @classmethod
     def validate_scheme(cls, v: HttpUrl) -> HttpUrl:
-        """Ensure scheme is explicitly http or https to prevent SSRF and protocol abuse."""
+        """Ensure scheme is http/https and prohibit loopback, link-local, and SSRF destinations."""
         if v.scheme not in ("http", "https"):
             raise ValueError(f"URL scheme '{v.scheme}' is not allowed. Must be http or https.")
+
+        host = v.host
+        if not host:
+            raise ValueError("URL host cannot be empty.")
+
+        lower_host = host.lower()
+        if lower_host in ("localhost", "0.0.0.0") or lower_host.endswith((".local", ".internal", ".lan")):
+            raise ValueError(f"Destination host '{host}' is prohibited for security (SSRF prevention).")
+
+        try:
+            ip = ipaddress.ip_address(host)
+            if ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+                raise ValueError(f"Destination IP '{host}' is prohibited for security (SSRF prevention).")
+            if str(ip) == "169.254.169.254":
+                raise ValueError(f"Access to metadata IP '{host}' is prohibited.")
+        except ValueError as err:
+            if "prohibited" in str(err):
+                raise
+
         return v
 
     @field_validator("custom_alias")
