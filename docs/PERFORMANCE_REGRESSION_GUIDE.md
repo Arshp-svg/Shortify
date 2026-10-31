@@ -106,3 +106,4 @@ When `scripts/check_regression.py` exits with code `1`:
 4. **If error rate $>0.5\%$:**
    - Search logs for HTTP 500 exceptions: `grep -i "500" logs/app.log`.
    - Verify PostgreSQL connection limit (`SHOW max_connections;`).
+

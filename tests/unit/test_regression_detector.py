@@ -150,3 +150,4 @@ def test_markdown_report_formatting() -> None:
     assert "# Shortify — Performance Regression Comparison Report" in report
     assert "`redirect`" in report
     assert "PASSED (NO REGRESSION)" in report
+

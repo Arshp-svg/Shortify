@@ -52,7 +52,9 @@ class URLCreateRequest(BaseModel):
             raise ValueError("URL host cannot be empty.")
 
         lower_host = host.lower()
-        if lower_host in ("localhost", "0.0.0.0") or lower_host.endswith((".local", ".internal", ".lan")):
+        if lower_host in ("localhost", "0.0.0.0") or lower_host.endswith(  # nosec B104
+            (".local", ".internal", ".lan")
+        ):
             raise ValueError(f"Destination host '{host}' is prohibited for security (SSRF prevention).")
 
         try:
