@@ -1,0 +1,52 @@
+{
+  "replicas": 2,
+  "timestamp": "2026-10-31T13:06:29.180472+00:00",
+  "commit": "9fccc11",
+  "workload": "MixedWorkloadUser",
+  "concurrency_users": 50,
+  "duration_seconds": 21.26,
+  "active_upstreams": [
+    "172.23.0.8:8000",
+    "172.23.0.6:8000"
+  ],
+  "metrics": {
+    "total_requests": 5936,
+    "failed_requests": 0,
+    "rps": 311.6,
+    "p50_ms": 92.0,
+    "p95_ms": 260.0,
+    "p99_ms": 320.0,
+    "avg_latency_ms": 128.64,
+    "error_rate_pct": 0.0
+  },
+  "container_resources": {
+    "shortify-api-2": {
+      "cpu_pct": "0.51%",
+      "memory": "73.97MiB / 7.619GiB"
+    },
+    "shortify-api-1": {
+      "cpu_pct": "0.13%",
+      "memory": "94.58MiB / 7.619GiB"
+    },
+    "shortify-nginx": {
+      "cpu_pct": "0.14%",
+      "memory": "33.29MiB / 7.619GiB"
+    },
+    "shortify-postgres": {
+      "cpu_pct": "0.24%",
+      "memory": "150.1MiB / 7.619GiB"
+    },
+    "shortify-grafana": {
+      "cpu_pct": "0.06%",
+      "memory": "55.52MiB / 7.619GiB"
+    },
+    "shortify-prometheus": {
+      "cpu_pct": "0.13%",
+      "memory": "37.94MiB / 7.619GiB"
+    },
+    "shortify-redis": {
+      "cpu_pct": "0.53%",
+      "memory": "11.02MiB / 7.619GiB"
+    }
+  }
+}

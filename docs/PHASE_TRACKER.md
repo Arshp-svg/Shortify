@@ -21,8 +21,8 @@
 | **Phase 8** | Redis caching & cache correctness | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Redis cache-aside, TTL/invalidation, fail-open resilience under outage, and benchmarks committed) |
 | **Phase 9** | Rate limiting & abuse controls | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Sliding-window Lua limiter, HTTP 429 Retry-After, single-IP flood test, microbenchmark, overhead comparison) |
 | **Phase 10**| Observability & dashboards | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Prometheus metrics, route normalization, structured logs, provisioned Grafana dashboard verified) |
-| **Phase 11**| Failure testing & resilience | `NOT STARTED` | — | — | Pending fault injection & recovery tests |
-| **Phase 12**| Horizontal scaling & load balancing | `NOT STARTED` | — | — | Pending 1/2/4 replica scaling benchmarks |
+| **Phase 11**| Failure testing & resilience | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Chaos experiments 1-4 completed, 5 resilience tests passing, report published) |
+| **Phase 12**| Horizontal scaling & load balancing | `COMPLETE` | 2026-10-31 | 2026-10-31 | Yes (Nginx upstream load balancing, 1/2/4 replica scaling benchmarks, sublinear bottleneck analyzed) |
 | **Phase 13**| Benchmark automation & regression detection | `NOT STARTED` | — | — | Pending automated benchmark CI rule |
 | **Phase 14**| Security, documentation & release | `NOT STARTED` | — | — | Pending security audit & release runbook |
 | **Phase 15**| Final benchmark report & resume evidence | `NOT STARTED` | — | — | Pending final evidence report |
@@ -131,12 +131,12 @@
 - [x] Publish `docs/FAILURE_EXPERIMENTS.md` with incident logs and recovery metrics
 - [x] **Proof of Done:** All 4 chaos experiments executed against Docker stack and passed; raw JSON evidence preserved in `benchmarks/chaos/chaos_experiments_summary.json`; deliverable report published in `docs/FAILURE_EXPERIMENTS.md`
 
-### Phase 12: Horizontal Scaling & Load Balancing (`NOT STARTED`)
-- [ ] Deploy Nginx reverse proxy with round-robin upstream load balancing
-- [ ] Deploy 1, 2, and 4 FastAPI API replicas
-- [ ] Run comparative scaling benchmark keeping DB/cache fixed
-- [ ] Identify and document the point where scaling becomes sublinear (shared DB/Redis bottleneck)
-- [ ] **Proof of Done:** 1 vs 2 vs 4 replica throughput comparison chart and bottleneck analysis
+### Phase 12: Horizontal Scaling & Load Balancing (`COMPLETE`)
+- [x] Deploy Nginx reverse proxy with round-robin upstream load balancing
+- [x] Deploy 1, 2, and 4 FastAPI API replicas
+- [x] Run comparative scaling benchmark keeping DB/cache fixed
+- [x] Identify and document the point where scaling becomes sublinear (shared DB/Redis bottleneck)
+- [x] **Proof of Done:** 1 vs 2 vs 4 replica throughput comparison chart and bottleneck analysis documented in `docs/SCALING_REPORT.md`
 
 ### Phase 13: Benchmark Automation & Regression Detection (`NOT STARTED`)
 - [ ] Build automated test runner script `scripts/run_benchmarks.py`
