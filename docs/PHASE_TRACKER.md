@@ -23,7 +23,7 @@
 | **Phase 10**| Observability & dashboards | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Prometheus metrics, route normalization, structured logs, provisioned Grafana dashboard verified) |
 | **Phase 11**| Failure testing & resilience | `COMPLETE` | 2026-10-25 | 2026-10-25 | Yes (Chaos experiments 1-4 completed, 5 resilience tests passing, report published) |
 | **Phase 12**| Horizontal scaling & load balancing | `COMPLETE` | 2026-10-31 | 2026-10-31 | Yes (Nginx upstream load balancing, 1/2/4 replica scaling benchmarks, sublinear bottleneck analyzed) |
-| **Phase 13**| Benchmark automation & regression detection | `NOT STARTED` | — | — | Pending automated benchmark CI rule |
+| **Phase 13**| Benchmark automation & regression detection | `COMPLETE` | 2026-10-31 | 2026-10-31 | Yes (Automated regression script, CI split, nightly benchmark workflow, 7 unit tests passing) |
 | **Phase 14**| Security, documentation & release | `NOT STARTED` | — | — | Pending security audit & release runbook |
 | **Phase 15**| Final benchmark report & resume evidence | `NOT STARTED` | — | — | Pending final evidence report |
 
@@ -138,11 +138,13 @@
 - [x] Identify and document the point where scaling becomes sublinear (shared DB/Redis bottleneck)
 - [x] **Proof of Done:** 1 vs 2 vs 4 replica throughput comparison chart and bottleneck analysis documented in `docs/SCALING_REPORT.md`
 
-### Phase 13: Benchmark Automation & Regression Detection (`NOT STARTED`)
-- [ ] Build automated test runner script `scripts/run_benchmarks.py`
-- [ ] Define automated CI rule warning or failing on >15% p95 latency regression
-- [ ] Split CI: fast pull-request tests vs scheduled nightly benchmark suite
-- [ ] **Proof of Done:** Automated script generates raw CSV and regression delta report
+### Phase 13: Benchmark Automation & Regression Detection (`COMPLETE`)
+- [x] Build automated test runner script `scripts/run_benchmarks.py`
+- [x] Define automated CI rule warning or failing on >15% p95 latency regression (`scripts/check_regression.py`)
+- [x] Split CI: fast pull-request tests (`.github/workflows/ci.yml`) vs scheduled nightly benchmark suite (`.github/workflows/benchmarks.yml`)
+- [x] Implement regression detector unit tests (`tests/unit/test_regression_detector.py`, 7/7 passed)
+- [x] Document methodology and troubleshooting guide (`docs/PERFORMANCE_REGRESSION_GUIDE.md`)
+- [x] **Proof of Done:** Automated script generates raw CSV and regression delta report; unit tests pass cleanly
 
 ### Phase 14: Security, Documentation & Release (`NOT STARTED`)
 - [ ] Validate URL schemes (block `file://`, `javascript:`, private IP SSRF attempts)

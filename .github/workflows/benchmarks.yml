@@ -1,0 +1,117 @@
+name: Nightly Performance Benchmarks & Regression Detection
+
+on:
+  schedule:
+    # Run nightly at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      concurrent_users:
+        description: 'Number of concurrent users'
+        required: false
+        default: '50'
+      duration_seconds:
+        description: 'Duration per benchmark scenario (seconds)'
+        required: false
+        default: '15'
+
+jobs:
+  benchmark-and-regression-check:
+    name: Automated Benchmark Suite & Regression Gate
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: shortify
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Project and Benchmark Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Apply Database Migrations
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/shortify
+        run: alembic upgrade head
+
+      - name: Seed Deterministic Dataset
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/shortify
+        run: python scripts/seed_urls.py --count 10000 --batch-size 2500
+
+      - name: Launch Shortify API Background Server
+        env:
+          ENVIRONMENT: development
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/shortify
+          POSTGRES_SERVER: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: shortify
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          CACHE_ENABLED: "true"
+          RATE_LIMIT_ENABLED: "false"
+        run: |
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          sleep 4
+          curl -f http://localhost:8000/health || exit 1
+
+      - name: Execute Automated Benchmark Suite
+        run: |
+          python scripts/run_benchmarks.py \
+            --users ${{ github.event.inputs.concurrent_users || '50' }} \
+            --duration ${{ github.event.inputs.duration_seconds || '15' }} \
+            --warmup 5 \
+            --output-dir benchmarks/nightly
+
+      - name: Audit Performance Against Baseline Thresholds
+        run: |
+          python scripts/check_regression.py \
+            --baseline benchmarks/baseline/latest_benchmark_summary.json \
+            --current benchmarks/nightly/latest_benchmark_summary.json \
+            --max-p95-regression 15.0 \
+            --max-p99-regression 20.0 \
+            --max-rps-drop 20.0 \
+            --max-error-rate 0.5 \
+            --report-out benchmarks/nightly/regression_report.md \
+            --fail-on-regression
+
+      - name: Upload Benchmark Artifacts and Regression Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-benchmark-results
+          path: benchmarks/nightly/
+          retention-days: 30
