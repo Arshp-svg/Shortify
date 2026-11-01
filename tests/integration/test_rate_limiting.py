@@ -86,9 +86,7 @@ async def test_multi_client_ip_isolation(test_redis_client: Redis) -> None:
     assert res_a_exhausted.allowed is False
 
     # IP B should still have full quota
-    res_b = await limiter.check_rate_limit(
-        client_ip=ip_b, bucket="iso", limit=limit, window=window
-    )
+    res_b = await limiter.check_rate_limit(client_ip=ip_b, bucket="iso", limit=limit, window=window)
     assert res_b.allowed is True
     assert res_b.remaining == 1
 

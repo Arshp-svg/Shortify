@@ -68,7 +68,12 @@ class CacheService:
             self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             record_cache_operation("get", "error")
-            logger.warning("Redis cache read failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
+            logger.warning(
+                "Redis cache read failure for '%s': %s (fail_open=%s)",
+                short_code,
+                exc,
+                self.fail_open,
+            )
             if self.fail_open:
                 return None
             raise
@@ -94,7 +99,12 @@ class CacheService:
             self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             record_cache_operation("set", "error")
-            logger.warning("Redis cache write failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
+            logger.warning(
+                "Redis cache write failure for '%s': %s (fail_open=%s)",
+                short_code,
+                exc,
+                self.fail_open,
+            )
             if self.fail_open:
                 return False
             raise
@@ -113,7 +123,12 @@ class CacheService:
             self._circuit_open_until = time.perf_counter() + self._circuit_break_duration
             self._local_errors += 1
             record_cache_operation("delete", "error")
-            logger.warning("Redis cache invalidation failure for '%s': %s (fail_open=%s)", short_code, exc, self.fail_open)
+            logger.warning(
+                "Redis cache invalidation failure for '%s': %s (fail_open=%s)",
+                short_code,
+                exc,
+                self.fail_open,
+            )
             if self.fail_open:
                 return False
             raise
@@ -153,7 +168,9 @@ class CacheService:
                 server_hits = int(server_stats.get("keyspace_hits", 0))
                 server_misses = int(server_stats.get("keyspace_misses", 0))
                 server_total = server_hits + server_misses
-                server_ratio = round((server_hits / server_total) * 100, 2) if server_total > 0 else 0.0
+                server_ratio = (
+                    round((server_hits / server_total) * 100, 2) if server_total > 0 else 0.0
+                )
 
                 stats["redis_server"] = {
                     "keyspace_hits": server_hits,

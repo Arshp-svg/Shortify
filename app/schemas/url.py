@@ -55,12 +55,16 @@ class URLCreateRequest(BaseModel):
         if lower_host in ("localhost", "0.0.0.0") or lower_host.endswith(  # nosec B104
             (".local", ".internal", ".lan")
         ):
-            raise ValueError(f"Destination host '{host}' is prohibited for security (SSRF prevention).")
+            raise ValueError(
+                f"Destination host '{host}' is prohibited for security (SSRF prevention)."
+            )
 
         try:
             ip = ipaddress.ip_address(host)
             if ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
-                raise ValueError(f"Destination IP '{host}' is prohibited for security (SSRF prevention).")
+                raise ValueError(
+                    f"Destination IP '{host}' is prohibited for security (SSRF prevention)."
+                )
             if str(ip) == "169.254.169.254":
                 raise ValueError(f"Access to metadata IP '{host}' is prohibited.")
         except ValueError as err:

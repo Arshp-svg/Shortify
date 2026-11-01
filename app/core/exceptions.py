@@ -167,7 +167,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(ConnectionRefusedError)
-    async def conn_refused_exception_handler(_: Request, exc: ConnectionRefusedError) -> JSONResponse:
+    async def conn_refused_exception_handler(
+        _: Request, exc: ConnectionRefusedError
+    ) -> JSONResponse:
         logger.error("Database connection refused: %s", exc)
         return _build_error_response(
             status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -178,7 +180,11 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(_: Request, exc: Exception) -> JSONResponse:
         exc_str = str(exc).lower()
-        if isinstance(exc, (OSError, socket.error)) or "name resolution" in exc_str or "cannot connect" in exc_str:
+        if (
+            isinstance(exc, (OSError, socket.error))
+            or "name resolution" in exc_str
+            or "cannot connect" in exc_str
+        ):
             logger.error("Database connection failure caught in unhandled: %s", exc)
             return _build_error_response(
                 status.HTTP_503_SERVICE_UNAVAILABLE,

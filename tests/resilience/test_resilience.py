@@ -53,9 +53,7 @@ async def test_redis_outage_rate_limit_fail_open(async_client: AsyncClient) -> N
     with patch(
         "app.core.rate_limit.get_rate_limiter",
         return_value=RateLimiter(
-            redis_client=AsyncMock(
-                eval=AsyncMock(side_effect=RedisConnectionError("Redis down"))
-            )
+            redis_client=AsyncMock(eval=AsyncMock(side_effect=RedisConnectionError("Redis down")))
         ),
     ):
         resp = await async_client.get("/s0000001", follow_redirects=False)

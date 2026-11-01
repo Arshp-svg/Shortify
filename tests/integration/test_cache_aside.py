@@ -112,9 +112,7 @@ async def test_cache_ttl_on_expiring_url(
 
 
 @pytest.mark.asyncio
-async def test_fail_open_on_redis_error(
-    db_session: Any, clean_urls_table: None
-) -> None:
+async def test_fail_open_on_redis_error(db_session: Any, clean_urls_table: None) -> None:
     """Verify that when Redis throws errors, fail-open policy serves the request via PostgreSQL."""
     repo = URLRepository(db_session)
 

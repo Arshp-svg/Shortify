@@ -17,6 +17,22 @@ import pytest
 LOAD_BALANCER_URL = os.getenv("LOAD_BALANCER_URL", "http://localhost:8000")
 
 
+def _is_load_balancer_reachable() -> bool:
+    import urllib.request
+
+    try:
+        with urllib.request.urlopen(f"{LOAD_BALANCER_URL}/health", timeout=1.0) as resp:
+            return bool(resp.status == 200)
+    except Exception:
+        return False
+
+
+pytestmark = pytest.mark.skipif(
+    not _is_load_balancer_reachable(),
+    reason=f"Live load balancer not reachable at {LOAD_BALANCER_URL}",
+)
+
+
 @pytest.mark.asyncio
 async def test_nginx_health_and_upstream_headers() -> None:
     """Verify Nginx proxies /health and appends X-Upstream-Addr header."""
@@ -95,10 +111,7 @@ async def test_shared_atomic_click_counter_under_concurrency() -> None:
         url_id = data["id"]
 
         # Send 30 concurrent redirect requests
-        tasks = [
-            client.get(f"/{short_code}", follow_redirects=False)
-            for _ in range(30)
-        ]
+        tasks = [client.get(f"/{short_code}", follow_redirects=False) for _ in range(30)]
         responses = await asyncio.gather(*tasks)
 
         for resp in responses:
@@ -108,4 +121,3 @@ async def test_shared_atomic_click_counter_under_concurrency() -> None:
         stats_resp = await client.get(f"/api/v1/urls/{url_id}/stats")
         assert stats_resp.status_code == 200
         assert stats_resp.json()["click_count"] == 30
-

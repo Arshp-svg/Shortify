@@ -225,9 +225,7 @@ def get_rate_limit_policy(request: Request, settings: Settings) -> tuple[str, in
     return bucket, limit, window
 
 
-async def rate_limit_middleware(
-    request: Request, call_next: RequestResponseEndpoint
-) -> Response:
+async def rate_limit_middleware(request: Request, call_next: RequestResponseEndpoint) -> Response:
     """FastAPI/Starlette middleware enforcing Redis-backed sliding-window rate limits."""
     settings = get_settings()
 

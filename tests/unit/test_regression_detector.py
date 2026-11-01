@@ -8,14 +8,26 @@ def test_evaluate_regression_clean_pass() -> None:
     baseline = {
         "redirect": {
             "scenario": "redirect",
-            "results": {"rps": 400.0, "p50_ms": 50.0, "p95_ms": 100.0, "p99_ms": 150.0, "error_rate_pct": 0.0},
+            "results": {
+                "rps": 400.0,
+                "p50_ms": 50.0,
+                "p95_ms": 100.0,
+                "p99_ms": 150.0,
+                "error_rate_pct": 0.0,
+            },
         }
     }
     # 5% latency increase, 2% higher RPS (within 15% tolerance)
     current = {
         "redirect": {
             "scenario": "redirect",
-            "results": {"rps": 410.0, "p50_ms": 52.0, "p95_ms": 105.0, "p99_ms": 155.0, "error_rate_pct": 0.0},
+            "results": {
+                "rps": 410.0,
+                "p50_ms": 52.0,
+                "p95_ms": 105.0,
+                "p99_ms": 155.0,
+                "error_rate_pct": 0.0,
+            },
         }
     }
 
@@ -146,8 +158,9 @@ def test_markdown_report_formatting() -> None:
             "error_rate_pct": 0.0,
         }
     ]
-    report = generate_markdown_report(deltas, violations=[], baseline_commit="abc1234", current_commit="def5678")
+    report = generate_markdown_report(
+        deltas, violations=[], baseline_commit="abc1234", current_commit="def5678"
+    )
     assert "# Shortify — Performance Regression Comparison Report" in report
     assert "`redirect`" in report
     assert "PASSED (NO REGRESSION)" in report
-

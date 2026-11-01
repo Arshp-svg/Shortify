@@ -101,6 +101,7 @@ app.include_router(health_router)
 # Mount versioned API routes
 app.include_router(api_v1_router)
 
+
 @app.get("/metrics", tags=["Observability"], include_in_schema=False)
 async def metrics() -> Response:
     """Prometheus metrics scrape endpoint."""
