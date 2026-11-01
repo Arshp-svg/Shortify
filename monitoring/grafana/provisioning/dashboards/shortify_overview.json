@@ -31,6 +31,7 @@
         "defaults": {
           "color": { "mode": "thresholds" },
           "mappings": [],
+          "noValue": "0.0%",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -58,13 +59,13 @@
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "editorMode": "code",
-          "expr": "(sum(rate(shortify_http_requests_total{status=~\"[45]..\"}[1m])) / (sum(rate(shortify_http_requests_total[1m])) + 0.0001)) * 100",
-          "legendFormat": "Error Rate %",
+          "expr": "((sum(rate(shortify_http_requests_total{status=~\"5..\"}[1m])) or vector(0)) / (sum(rate(shortify_http_requests_total[1m])) + 0.0001)) * 100",
+          "legendFormat": "5xx Error Rate %",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "HTTP Error Rate (%)",
+      "title": "HTTP 5xx Error Rate (%)",
       "type": "stat"
     },
     {
