@@ -1,6 +1,8 @@
 name: Nightly Performance Benchmarks & Regression Detection
 
 on:
+  push:
+    branches: [main]
   schedule:
     # Run nightly at 02:00 UTC
     - cron: '0 2 * * *'
