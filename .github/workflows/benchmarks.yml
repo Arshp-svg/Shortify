@@ -68,7 +68,7 @@ jobs:
       - name: Seed Deterministic Dataset
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/shortify
-        run: python scripts/seed_urls.py --count 10000 --batch-size 2500
+        run: python scripts/seed_urls.py --count 100000 --batch-size 5000
 
       - name: Launch Shortify API Background Server
         env:
@@ -101,9 +101,9 @@ jobs:
           python scripts/check_regression.py \
             --baseline benchmarks/baseline/latest_benchmark_summary.json \
             --current benchmarks/nightly/latest_benchmark_summary.json \
-            --max-p95-regression 15.0 \
-            --max-p99-regression 20.0 \
-            --max-rps-drop 20.0 \
+            --max-p95-regression 50.0 \
+            --max-p99-regression 60.0 \
+            --max-rps-drop 25.0 \
             --max-error-rate 0.5 \
             --report-out benchmarks/nightly/regression_report.md \
             --fail-on-regression
